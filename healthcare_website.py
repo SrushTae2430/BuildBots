@@ -1,0 +1,1839 @@
+import streamlit as st
+import streamlit.components.v1 as components
+
+# ========================================
+# PAGE CONFIGURATION
+# ========================================
+st.set_page_config(
+    page_title="HealthCare AI - Early Disease Detection",
+    page_icon="🏥",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# ========================================
+# CUSTOM CSS STYLING
+# ========================================
+st.markdown("""
+<style>
+    /* Remove default padding */
+    .main {
+        padding: 0;
+        padding-top: 0 !important;
+    }
+    
+    .block-container {
+        padding-top: 0 !important;
+        padding-bottom: 0;
+        max-width: 100%;
+        margin-top: 0 !important;
+    }
+    
+    /* Fix Streamlit header overlap */
+    header {
+        background-color: transparent !important;
+    }
+    
+    .main > div {
+        padding-top: 0 !important;
+    }
+    
+    /* Header styling */
+    .header {
+        background: linear-gradient(135deg, #00d4ff 0%, #00a8cc 100%);
+        padding: 2rem 3rem;
+        color: white;
+        margin-bottom: 0;
+        min-height: 100px;
+    }
+    
+    .header-title {
+        font-size: 2.2rem;
+        font-weight: bold;
+        margin: 0;
+        padding-top: 0.5rem;
+        line-height: 1.3;
+    }
+    
+    .header-subtitle {
+        font-size: 1rem;
+        opacity: 0.95;
+        margin-top: 0.5rem;
+        padding-bottom: 0.3rem;
+        line-height: 1.4;
+    }
+    
+    /* Hero section */
+    .hero-section {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        padding: 5rem 3rem;
+        margin-bottom: 3rem;
+    }
+    
+    .hero-badge {
+        display: inline-block;
+        color: #00a8cc;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+        color: #1a5f7a;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.4rem;
+        color: #2d5f7a;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 0.6rem 1.8rem;
+        background: white;
+        border-radius: 30px;
+        margin: 0.5rem 0.5rem 0.5rem 0;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+        font-weight: 600;
+        color: #2d5f7a;
+    }
+    
+    /* Feature cards */
+    .feature-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        text-align: center;
+        margin: 1rem 0;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }
+    
+    .feature-icon {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .feature-title {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: #2d3748;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-desc {
+        color: #718096;
+        font-size: 1.05rem;
+        line-height: 1.6;
+    }
+    
+    /* Disease cards */
+    .disease-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin: 1.5rem 0;
+        transition: all 0.3s ease;
+    }
+    
+    .disease-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+    
+    .disease-header {
+        padding: 2rem;
+        color: white;
+        font-size: 2rem;
+        font-weight: bold;
+    }
+    
+    .disease-content {
+        padding: 2rem;
+    }
+    
+    .disease-content h4 {
+        color: #2d3748;
+        font-size: 1.3rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .disease-content ul {
+        margin-left: 1.5rem;
+        line-height: 1.8;
+    }
+    
+    .disease-content li {
+        color: #4a5568;
+        margin-bottom: 0.5rem;
+    }
+    
+    .diabetes-header {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    }
+    
+    .skin-header {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .heart-header {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+    
+    .respiratory-header {
+        background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+    }
+    
+    /* Privacy notice */
+    .privacy-notice {
+        background: #d4f4dd;
+        border-left: 5px solid #38b2ac;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 2rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2d5f7a;
+    }
+    
+    /* Section titles */
+    .section-title {
+        font-size: 2.8rem;
+        font-weight: bold;
+        color: #2d3748;
+        margin: 4rem 0 1rem 0;
+        text-align: center;
+    }
+    
+    .section-subtitle {
+        text-align: center;
+        color: #718096;
+        font-size: 1.2rem;
+        margin-bottom: 3rem;
+    }
+    
+    /* Footer */
+    .footer {
+        background: #1a202c;
+        color: white;
+        padding: 4rem 3rem 2rem 3rem;
+        margin-top: 5rem;
+    }
+    
+    .footer-section {
+        margin-bottom: 2rem;
+    }
+    
+    .footer-title {
+        font-size: 1.4rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: #00d4ff;
+    }
+    
+    .footer-content {
+        line-height: 1.8;
+        color: #cbd5e0;
+    }
+    
+    .footer-bottom {
+        text-align: center;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid #4a5568;
+        color: #a0aec0;
+    }
+    
+    /* Login form styling */
+    .login-container {
+        background: white;
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        margin: 3rem auto;
+    }
+    
+    .login-title {
+        text-align: center;
+        color: #2d3748;
+        font-size: 2.2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    
+    .login-subtitle {
+        text-align: center;
+        color: #718096;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .section-header {
+        background: linear-gradient(135deg, #00d4ff 0%, #00a8cc 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        margin: 2rem 0 1.5rem 0;
+        font-size: 1.3rem;
+        font-weight: bold;
+    }
+    
+    /* App redirect styling */
+    .app-redirect-container {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        border-radius: 20px;
+        margin: 2rem 0;
+    }
+    
+    .app-redirect-title {
+        font-size: 3.5rem;
+        color: #1a5f7a;
+        font-weight: bold;
+        margin-bottom: 2rem;
+    }
+    
+    .app-redirect-text {
+        font-size: 1.3rem;
+        color: #2d5f7a;
+        margin: 2rem 0;
+        line-height: 1.8;
+    }
+    
+    .download-button {
+        background: linear-gradient(135deg, #00d4ff 0%, #00a8cc 100%);
+        color: white;
+        padding: 1.5rem 3rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-size: 1.4rem;
+        font-weight: bold;
+        display: inline-block;
+        margin: 2rem 0;
+        box-shadow: 0 6px 25px rgba(0,168,204,0.4);
+        transition: all 0.3s ease;
+    }
+    
+    .download-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 35px rgba(0,168,204,0.6);
+    }
+    
+    .app-features {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-top: 3rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .app-features h3 {
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+    }
+    
+    .app-features ul {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .app-features li {
+        color: #4a5568;
+        font-size: 1.1rem;
+        margin: 1rem 0;
+        padding-left: 1.5rem;
+    }
+    
+    /* Streamlit button overrides */
+    .stButton > button {
+        width: 100%;
+        background: linear-gradient(135deg, #00d4ff 0%, #00a8cc 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,168,204,0.3);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,168,204,0.5);
+    }
+    
+    /* Form styling */
+    .stTextInput > div > div > input,
+    .stSelectbox > div > div > select,
+    .stNumberInput > div > div > input {
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+    
+    .stTextInput > div > div > input:focus,
+    .stSelectbox > div > div > select:focus,
+    .stNumberInput > div > div > input:focus {
+        border-color: #00a8cc;
+        box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+    }
+    
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    
+</style>
+""", unsafe_allow_html=True)
+
+# ========================================
+# SESSION STATE INITIALIZATION
+# ========================================
+if 'page' not in st.session_state:
+    st.session_state.page = 'home'
+
+if 'language' not in st.session_state:
+    st.session_state.language = 'English'
+
+# ========================================
+# MULTI-LANGUAGE TRANSLATIONS
+# ========================================
+TRANSLATIONS = {
+    'English': {
+        'site_title': 'HealthCare AI',
+        'site_subtitle': 'Early Detection • AI Insights • Privacy First',
+        'trusted_platform': 'Trusted Healthcare Platform',
+        'hero_title': 'Your Health, Our Priority',
+        'hero_subtitle': 'AI-powered early disease detection for Indian families.\nPersonalized insights in your language.',
+        'privacy_badge': '🛡️ Privacy Protected',
+        'languages_badge': '🌐 6 Languages',
+        'privacy_notice': '🔒 Your medical data is encrypted, private, and never shared.',
+        'get_started': '🚀 Get Started (Login)',
+        'try_chatbot': '💬 Try AI Chatbot',
+        'start_assessment': '🏥 Start Health Assessment',
+        'our_features': 'Our Features',
+        'features_subtitle': 'Comprehensive AI-powered health platform designed for you',
+        'smart_ai_title': 'Smart AI Assistant',
+        'smart_ai_desc': 'Empathetic chatbot asks targeted questions using your profile data for personalized health insights',
+        'privacy_title': 'Privacy Protected',
+        'privacy_desc': 'Your medical data is encrypted, stored locally, and never shared with third parties',
+        'early_detection_title': 'Early Detection',
+        'early_detection_desc': 'Identify health risks early with AI-assisted pattern recognition and expert guidance',
+        'health_assessments': 'Health Assessments',
+        'assessments_subtitle': 'Select a condition to learn more and start your AI-assisted assessment',
+        'diabetes': 'Diabetes',
+        'skin_diseases': 'Skin Diseases',
+        'heart_health': 'Heart Health',
+        'respiratory': 'Respiratory Health',
+        'common_symptoms': 'Common Symptoms:',
+        'risk_factors': 'Risk Factors:',
+        'prevention_tips': 'Prevention Tips:',
+        'warning_signs': 'Warning Signs:',
+        'when_seek_help': 'When to Seek Help:',
+        'common_conditions': 'Common Respiratory Conditions:',
+        'chatbot_features': 'AI Chatbot Features',
+        'chatbot_subtitle': 'Experience intelligent, personalized health conversations',
+        'intelligent_conv': 'Intelligent Conversations',
+        'intelligent_desc': 'Advanced natural language processing understands your health concerns and asks relevant follow-up questions based on your responses',
+        'personalized_insights': 'Personalized Insights',
+        'personalized_desc': 'Uses your health profile, lifestyle habits, and medical history to provide tailored recommendations and health risk assessments',
+        'multi_language': 'Multi-language Support',
+        'multi_language_desc': 'Communicate in your preferred language: English, Hindi (हिन्दी), Marathi (मराठी), Tamil (தமிழ்), Telugu (తెలుగు), and Bengali (বাংলা)',
+        'footer_about': 'About HealthCare AI',
+        'footer_about_text': 'AI-powered healthcare platform designed for early disease detection and personalized health insights for Indian users. Our mission is to make quality healthcare accessible to everyone through technology.',
+        'footer_languages': 'Languages Supported',
+        'footer_disclaimer': 'Important Disclaimer',
+        'footer_disclaimer_text': 'This is a prototype for educational purposes. The information provided is not a substitute for professional medical advice. Always consult qualified healthcare professionals for medical diagnosis and treatment.',
+        'footer_copyright': '© 2026 HealthCare AI. Privacy-first healthcare technology.\nYour health data is encrypted and never shared with third parties.',
+        'download_app': '📱 Download Our Mobile App',
+        'download_text': 'For the best experience and to access all features including:\nAI Chatbot, Health Assessments, and Personalized Insights\n\nPlease download our mobile application from the Google Play Store.',
+        'download_button': '📥 Download from Google Play Store',
+        'app_features': '🌟 App Features Available:',
+        'app_note': '📌 Note: The full chatbot experience and interactive features are only available on our mobile app for the best user experience.',
+        'back_home': '← Back to Home',
+        'login_title': 'Login to Continue',
+        'login_subtitle': 'Complete your health profile to get started',
+        'login_text': 'Login helps personalize your health insights securely.',
+        'basic_info': '1️⃣ Basic Information',
+        'preferred_language': 'Preferred Language *',
+        'email': 'Email *',
+        'age': 'Age *',
+        'gender': 'Gender (Optional)',
+        'physical_measurements': '2️⃣ Physical Measurements (Optional)',
+        'height': 'Height (cm)',
+        'weight': 'Weight (kg)',
+        'lifestyle_habits': '3️⃣ Lifestyle & Habits (Optional)',
+        'lifestyle': 'Lifestyle',
+        'smoking_status': 'Smoking Status',
+        'alcohol_consumption': 'Alcohol Consumption',
+        'exercise_frequency': 'Exercise Frequency',
+        'diet_type': 'Diet Type',
+        'sleep': 'Average Sleep (hours/night)',
+        'stress_level': 'Stress Level',
+        'medical_history': '4️⃣ Medical History (Optional)',
+        'known_conditions': 'Known Medical Conditions',
+        'family_history': 'Family History of Diseases',
+        'login_button': 'Login & Continue to App',
+        'required_fields': '⚠️ Please fill in all required fields (Email and Age)',
+        'emergency_mode': '🚨 Emergency Mode',
+        'skin_conditions_title': 'Common Skin Conditions:',
+        'heart_habits_title': 'Heart-Healthy Habits:',
+        'data_driven_title': 'Data-Driven Insights',
+        'data_driven_desc': 'AI analyzes patterns in your health data to provide early warning signs and preventive health recommendations',
+        'health_reminders_title': 'Health Reminders',
+        'health_reminders_desc': 'Get timely reminders for medication, health check-ups, and lifestyle modifications based on your health profile',
+        'mobile_access_title': 'Mobile App Access',
+        'mobile_access_desc': 'Download our Android app for on-the-go access to all features, including offline health data viewing',
+        'emergency_title': 'Emergency First Aid',
+        'emergency_subtitle': 'Quick guidance until help arrives',
+        'india_emergency': 'India Emergency Numbers',
+        'ambulance': 'Ambulance:',
+        'police': 'Police:',
+        'fire': 'Fire:',
+        'heart_attack': 'Heart Attack',
+        'stroke_fast': 'Stroke (FAST Method)',
+        'breathing_difficulty': 'Severe Breathing Difficulty',
+        'diabetic_emergency': 'Diabetic Emergency (Low Sugar)',
+        'tap_first_aid': 'Tap for first aid steps',
+    },
+    'हिन्दी': {
+        'site_title': 'हेल्थकेयर एआई',
+        'site_subtitle': 'शीघ्र पहचान • एआई अंतर्दृष्टि • गोपनीयता प्रथम',
+        'trusted_platform': 'विश्वसनीय स्वास्थ्य सेवा मंच',
+        'hero_title': 'आपका स्वास्थ्य, हमारी प्राथमिकता',
+        'hero_subtitle': 'भारतीय परिवारों के लिए एआई-संचालित शीघ्र रोग पहचान।\nआपकी भाषा में व्यक्तिगत अंतर्दृष्टि।',
+        'privacy_badge': '🛡️ गोपनीयता सुरक्षित',
+        'languages_badge': '🌐 6 भाषाएं',
+        'privacy_notice': '🔒 आपका चिकित्सा डेटा एन्क्रिप्टेड, निजी है और कभी साझा नहीं किया जाता।',
+        'get_started': '🚀 शुरू करें (लॉगिन)',
+        'try_chatbot': '💬 एआई चैटबॉट आज़माएं',
+        'start_assessment': '🏥 स्वास्थ्य मूल्यांकन शुरू करें',
+        'our_features': 'हमारी विशेषताएं',
+        'features_subtitle': 'आपके लिए डिज़ाइन किया गया व्यापक एआई-संचालित स्वास्थ्य मंच',
+        'smart_ai_title': 'स्मार्ट एआई सहायक',
+        'smart_ai_desc': 'व्यक्तिगत स्वास्थ्य अंतर्दृष्टि के लिए आपकी प्रोफ़ाइल डेटा का उपयोग करके लक्षित प्रश्न पूछता है',
+        'privacy_title': 'गोपनीयता सुरक्षित',
+        'privacy_desc': 'आपका चिकित्सा डेटा एन्क्रिप्टेड है, स्थानीय रूप से संग्रहीत है और कभी तीसरे पक्ष के साथ साझा नहीं किया जाता',
+        'early_detection_title': 'शीघ्र पहचान',
+        'early_detection_desc': 'एआई-सहायता प्राप्त पैटर्न पहचान और विशेषज्ञ मार्गदर्शन के साथ स्वास्थ्य जोखिमों की शीघ्र पहचान करें',
+        'health_assessments': 'स्वास्थ्य मूल्यांकन',
+        'assessments_subtitle': 'अधिक जानने और अपना एआई-सहायता प्राप्त मूल्यांकन शुरू करने के लिए एक स्थिति चुनें',
+        'diabetes': 'मधुमेह',
+        'skin_diseases': 'त्वचा रोग',
+        'heart_health': 'हृदय स्वास्थ्य',
+        'respiratory': 'श्वसन स्वास्थ्य',
+        'common_symptoms': 'सामान्य लक्षण:',
+        'risk_factors': 'जोखिम कारक:',
+        'prevention_tips': 'रोकथाम युक्तियाँ:',
+        'warning_signs': 'चेतावनी संकेत:',
+        'when_seek_help': 'कब मदद लें:',
+        'common_conditions': 'सामान्य श्वसन स्थितियां:',
+        'chatbot_features': 'एआई चैटबॉट विशेषताएं',
+        'chatbot_subtitle': 'बुद्धिमान, व्यक्तिगत स्वास्थ्य वार्तालाप का अनुभव करें',
+        'intelligent_conv': 'बुद्धिमान वार्तालाप',
+        'intelligent_desc': 'उन्नत प्राकृतिक भाषा प्रसंस्करण आपकी स्वास्थ्य चिंताओं को समझता है और आपकी प्रतिक्रियाओं के आधार पर प्रासंगिक अनुवर्ती प्रश्न पूछता है',
+        'personalized_insights': 'व्यक्तिगत अंतर्दृष्टि',
+        'personalized_desc': 'अनुकूलित सिफारिशें और स्वास्थ्य जोखिम मूल्यांकन प्रदान करने के लिए आपकी स्वास्थ्य प्रोफ़ाइल, जीवन शैली की आदतों और चिकित्सा इतिहास का उपयोग करता है',
+        'multi_language': 'बहु-भाषा समर्थन',
+        'multi_language_desc': 'अपनी पसंदीदा भाषा में संवाद करें: अंग्रेजी, हिन्दी, मराठी, तमिल, तेलुगु और बंगाली',
+        'footer_about': 'हेल्थकेयर एआई के बारे में',
+        'footer_about_text': 'भारतीय उपयोगकर्ताओं के लिए शीघ्र रोग पहचान और व्यक्तिगत स्वास्थ्य अंतर्दृष्टि के लिए डिज़ाइन किया गया एआई-संचालित स्वास्थ्य सेवा मंच। हमारा मिशन प्रौद्योगिकी के माध्यम से सभी के लिए गुणवत्तापूर्ण स्वास्थ्य सेवा को सुलभ बनाना है।',
+        'footer_languages': 'समर्थित भाषाएं',
+        'footer_disclaimer': 'महत्वपूर्ण अस्वीकरण',
+        'footer_disclaimer_text': 'यह शैक्षिक उद्देश्यों के लिए एक प्रोटोटाइप है। प्रदान की गई जानकारी पेशेवर चिकित्सा सलाह का विकल्प नहीं है। चिकित्सा निदान और उपचार के लिए हमेशा योग्य स्वास्थ्य सेवा पेशेवरों से परामर्श लें।',
+        'footer_copyright': '© 2026 हेल्थकेयर एआई। गोपनीयता-प्रथम स्वास्थ्य सेवा प्रौद्योगिकी।\nआपका स्वास्थ्य डेटा एन्क्रिप्टेड है और कभी तीसरे पक्ष के साथ साझा नहीं किया जाता।',
+        'download_app': '📱 हमारा मोबाइल ऐप डाउनलोड करें',
+        'download_text': 'सर्वोत्तम अनुभव और सभी सुविधाओं तक पहुंच के लिए:\nएआई चैटबॉट, स्वास्थ्य मूल्यांकन और व्यक्तिगत अंतर्दृष्टि\n\nकृपया Google Play Store से हमारा मोबाइल एप्लिकेशन डाउनलोड करें।',
+        'download_button': '📥 Google Play Store से डाउनलोड करें',
+        'app_features': '🌟 उपलब्ध ऐप विशेषताएं:',
+        'app_note': '📌 नोट: पूर्ण चैटबॉट अनुभव और इंटरैक्टिव सुविधाएं केवल सर्वोत्तम उपयोगकर्ता अनुभव के लिए हमारे मोबाइल ऐप पर उपलब्ध हैं।',
+        'back_home': '← होम पर वापस जाएं',
+        'login_title': 'जारी रखने के लिए लॉगिन करें',
+        'login_subtitle': 'शुरू करने के लिए अपनी स्वास्थ्य प्रोफ़ाइल पूर्ण करें',
+        'login_text': 'लॉगिन आपकी स्वास्थ्य अंतर्दृष्टि को सुरक्षित रूप से वैयक्तिकृत करने में मदद करता है।',
+        'basic_info': '1️⃣ बुनियादी जानकारी',
+        'preferred_language': 'पसंदीदा भाषा *',
+        'email': 'ईमेल *',
+        'age': 'आयु *',
+        'gender': 'लिंग (वैकल्पिक)',
+        'physical_measurements': '2️⃣ शारीरिक माप (वैकल्पिक)',
+        'height': 'ऊंचाई (सेमी)',
+        'weight': 'वजन (किलो)',
+        'lifestyle_habits': '3️⃣ जीवनशैली और आदतें (वैकल्पिक)',
+        'lifestyle': 'जीवनशैली',
+        'smoking_status': 'धूम्रपान की स्थिति',
+        'alcohol_consumption': 'शराब की खपत',
+        'exercise_frequency': 'व्यायाम की आवृत्ति',
+        'diet_type': 'आहार प्रकार',
+        'sleep': 'औसत नींद (घंटे/रात)',
+        'stress_level': 'तनाव स्तर',
+        'medical_history': '4️⃣ चिकित्सा इतिहास (वैकल्पिक)',
+        'known_conditions': 'ज्ञात चिकित्सा स्थितियां',
+        'family_history': 'रोगों का पारिवारिक इतिहास',
+        'login_button': 'लॉगिन करें और ऐप पर जारी रखें',
+        'required_fields': '⚠️ कृपया सभी आवश्यक फ़ील्ड भरें (ईमेल और आयु)',
+        'emergency_mode': '🚨 आपातकालीन मोड',
+        'skin_conditions_title': 'सामान्य त्वचा स्थितियां:',
+        'heart_habits_title': 'हृदय-स्वस्थ आदतें:',
+        'data_driven_title': 'डेटा-संचालित अंतर्दृष्टि',
+        'data_driven_desc': 'एआई आपके स्वास्थ्य डेटा में पैटर्न का विश्लेषण करता है और शीघ्र चेतावनी संकेत और निवारक स्वास्थ्य सिफारिशें प्रदान करता है',
+        'health_reminders_title': 'स्वास्थ्य अनुस्मारक',
+        'health_reminders_desc': 'अपनी स्वास्थ्य प्रोफ़ाइल के आधार पर दवा, स्वास्थ्य जांच और जीवनशैली संशोधनों के लिए समय पर अनुस्मारक प्राप्त करें',
+        'mobile_access_title': 'मोबाइल ऐप एक्सेस',
+        'mobile_access_desc': 'ऑफलाइन स्वास्थ्य डेटा देखने सहित सभी सुविधाओं तक चलते-फिरते पहुंच के लिए हमारा एंड्रॉइड ऐप डाउनलोड करें',
+        'emergency_title': 'आपातकालीन प्राथमिक चिकित्सा',
+        'emergency_subtitle': 'मदद आने तक त्वरित मार्गदर्शन',
+        'india_emergency': 'भारत आपातकालीन नंबर',
+        'ambulance': 'एम्बुलेंस:',
+        'police': 'पुलिस:',
+        'fire': 'अग्निशमन:',
+        'heart_attack': 'दिल का दौरा',
+        'stroke_fast': 'स्ट्रोक (FAST विधि)',
+        'breathing_difficulty': 'गंभीर सांस लेने में कठिनाई',
+        'diabetic_emergency': 'मधुमेह आपातकाल (कम शुगर)',
+        'tap_first_aid': 'प्राथमिक चिकित्सा चरणों के लिए टैप करें',
+    },
+    'मराठी': {
+        'site_title': 'हेल्थकेअर एआय',
+        'site_subtitle': 'लवकर शोध • एआय अंतर्दृष्टी • गोपनीयता प्रथम',
+        'trusted_platform': 'विश्वासार्ह आरोग्य सेवा व्यासपीठ',
+        'hero_title': 'तुमचे आरोग्य, आमची प्राथमिकता',
+        'hero_subtitle': 'भारतीय कुटुंबांसाठी एआय-चालित लवकर रोग शोध।\nतुमच्या भाषेत वैयक्तिक अंतर्दृष्टी।',
+        'privacy_badge': '🛡️ गोपनीयता संरक्षित',
+        'languages_badge': '🌐 6 भाषा',
+        'privacy_notice': '🔒 तुमचा वैद्यकीय डेटा एन्क्रिप्टेड, खाजगी आहे आणि कधीही शेअर केला जात नाही।',
+        'get_started': '🚀 सुरुवात करा (लॉगिन)',
+        'try_chatbot': '💬 एआय चॅटबॉट वापरून पहा',
+        'start_assessment': '🏥 आरोग्य मूल्यांकन सुरू करा',
+        'our_features': 'आमची वैशिष्ट्ये',
+        'features_subtitle': 'तुमच्यासाठी डिझाइन केलेले सर्वसमावेशक एआय-चालित आरोग्य व्यासपीठ',
+        'smart_ai_title': 'स्मार्ट एआय सहाय्यक',
+        'smart_ai_desc': 'वैयक्तिक आरोग्य अंतर्दृष्टीसाठी तुमच्या प्रोफाइल डेटाचा वापर करून लक्ष्यित प्रश्न विचारतो',
+        'privacy_title': 'गोपनीयता संरक्षित',
+        'privacy_desc': 'तुमचा वैद्यकीय डेटा एन्क्रिप्टेड आहे, स्थानिक पातळीवर संग्रहित आहे आणि कधीही तृतीय पक्षांसह शेअर केला जात नाही',
+        'early_detection_title': 'लवकर शोध',
+        'early_detection_desc': 'एआय-सहाय्यित पॅटर्न ओळख आणि तज्ञ मार्गदर्शनासह आरोग्य जोखीम लवकर ओळखा',
+        'health_assessments': 'आरोग्य मूल्यांकन',
+        'assessments_subtitle': 'अधिक जाणून घेण्यासाठी आणि तुमचे एआय-सहाय्यित मूल्यांकन सुरू करण्यासाठी स्थिती निवडा',
+        'diabetes': 'मधुमेह',
+        'skin_diseases': 'त्वचा रोग',
+        'heart_health': 'हृदय आरोग्य',
+        'respiratory': 'श्वसन आरोग्य',
+        'common_symptoms': 'सामान्य लक्षणे:',
+        'risk_factors': 'जोखीम घटक:',
+        'prevention_tips': 'प्रतिबंध टिपा:',
+        'warning_signs': 'चेतावणी चिन्हे:',
+        'when_seek_help': 'मदत कधी घ्यावी:',
+        'common_conditions': 'सामान्य श्वसन स्थिती:',
+        'chatbot_features': 'एआय चॅटबॉट वैशिष्ट्ये',
+        'chatbot_subtitle': 'बुद्धिमान, वैयक्तिक आरोग्य संभाषणांचा अनुभव घ्या',
+        'intelligent_conv': 'बुद्धिमान संभाषण',
+        'intelligent_desc': 'प्रगत नैसर्गिक भाषा प्रक्रिया तुमच्या आरोग्य चिंता समजून घेते आणि तुमच्या प्रतिसादांवर आधारित संबंधित फॉलो-अप प्रश्न विचारते',
+        'personalized_insights': 'वैयक्तिक अंतर्दृष्टी',
+        'personalized_desc': 'अनुकूलित शिफारसी आणि आरोग्य जोखीम मूल्यांकन प्रदान करण्यासाठी तुमची आरोग्य प्रोफाइल, जीवनशैली सवयी आणि वैद्यकीय इतिहास वापरते',
+        'multi_language': 'बहु-भाषा समर्थन',
+        'multi_language_desc': 'तुमच्या पसंतीच्या भाषेत संवाद साधा: इंग्रजी, हिंदी, मराठी, तमिळ, तेलुगु आणि बंगाली',
+        'footer_about': 'हेल्थकेअर एआय बद्दल',
+        'footer_about_text': 'भारतीय वापरकर्त्यांसाठी लवकर रोग शोध आणि वैयक्तिक आरोग्य अंतर्दृष्टीसाठी डिझाइन केलेले एआय-चालित आरोग्य सेवा व्यासपीठ। आमचे ध्येय तंत्रज्ञानाद्वारे सर्वांसाठी दर्जेदार आरोग्य सेवा सुलभ करणे आहे।',
+        'footer_languages': 'समर्थित भाषा',
+        'footer_disclaimer': 'महत्त्वाचा अस्वीकरण',
+        'footer_disclaimer_text': 'हे शैक्षणिक हेतूंसाठी एक प्रोटोटाइप आहे. प्रदान केलेली माहिती व्यावसायिक वैद्यकीय सल्ल्याचा पर्याय नाही. वैद्यकीय निदान आणि उपचारांसाठी नेहमी पात्र आरोग्य सेवा व्यावसायिकांशी सल्लामसलत करा।',
+        'footer_copyright': '© 2026 हेल्थकेअर एआय. गोपनीयता-प्रथम आरोग्य सेवा तंत्रज्ञान।\nतुमचा आरोग्य डेटा एन्क्रिप्टेड आहे आणि कधीही तृतीय पक्षांसह शेअर केला जात नाही।',
+        'download_app': '📱 आमचे मोबाइल अॅप डाउनलोड करा',
+        'download_text': 'सर्वोत्तम अनुभव आणि सर्व वैशिष्ट्यांमध्ये प्रवेश करण्यासाठी:\nएआय चॅटबॉट, आरोग्य मूल्यांकन आणि वैयक्तिक अंतर्दृष्टी\n\nकृपया Google Play Store वरून आमचे मोबाइल अॅप्लिकेशन डाउनलोड करा।',
+        'download_button': '📥 Google Play Store वरून डाउनलोड करा',
+        'app_features': '🌟 उपलब्ध अॅप वैशिष्ट्ये:',
+        'app_note': '📌 टीप: संपूर्ण चॅटबॉट अनुभव आणि परस्पर वैशिष्ट्ये केवळ सर्वोत्तम वापरकर्ता अनुभवासाठी आमच्या मोबाइल अॅपवर उपलब्ध आहेत।',
+        'back_home': '← होमवर परत या',
+        'login_title': 'सुरू ठेवण्यासाठी लॉगिन करा',
+        'login_subtitle': 'सुरुवात करण्यासाठी तुमची आरोग्य प्रोफाइल पूर्ण करा',
+        'login_text': 'लॉगिन तुमच्या आरोग्य अंतर्दृष्टी सुरक्षितपणे वैयक्तिकृत करण्यात मदत करते।',
+        'basic_info': '1️⃣ मूलभूत माहिती',
+        'preferred_language': 'पसंतीची भाषा *',
+        'email': 'ईमेल *',
+        'age': 'वय *',
+        'gender': 'लिंग (ऐच्छिक)',
+        'physical_measurements': '2️⃣ शारीरिक मापन (ऐच्छिक)',
+        'height': 'उंची (सेमी)',
+        'weight': 'वजन (किलो)',
+        'lifestyle_habits': '3️⃣ जीवनशैली आणि सवयी (ऐच्छिक)',
+        'lifestyle': 'जीवनशैली',
+        'smoking_status': 'धूम्रपान स्थिती',
+        'alcohol_consumption': 'अल्कोहोल सेवन',
+        'exercise_frequency': 'व्यायाम वारंवारता',
+        'diet_type': 'आहार प्रकार',
+        'sleep': 'सरासरी झोप (तास/रात्र)',
+        'stress_level': 'तणाव पातळी',
+        'medical_history': '4️⃣ वैद्यकीय इतिहास (ऐच्छिक)',
+        'known_conditions': 'ज्ञात वैद्यकीय स्थिती',
+        'family_history': 'रोगांचा कौटुंबिक इतिहास',
+        'login_button': 'लॉगिन करा आणि अॅपवर सुरू ठेवा',
+        'required_fields': '⚠️ कृपया सर्व आवश्यक फील्ड भरा (ईमेल आणि वय)',
+        'emergency_mode': '🚨 आपत्कालीन मोड',
+        'skin_conditions_title': 'सामान्य त्वचा स्थिती:',
+        'heart_habits_title': 'हृदय-आरोग्यदायी सवयी:',
+        'data_driven_title': 'डेटा-चालित अंतर्दृष्टी',
+        'data_driven_desc': 'एआय तुमच्या आरोग्य डेटामधील पॅटर्नचे विश्लेषण करते आणि लवकर चेतावनी चिन्हे आणि प्रतिबंधात्मक आरोग्य शिफारसी प्रदान करते',
+        'health_reminders_title': 'आरोग्य स्मरणपत्रे',
+        'health_reminders_desc': 'तुमच्या आरोग्य प्रोफाइलवर आधारित औषध, आरोग्य तपासणी आणि जीवनशैली बदलांसाठी वेळेवर स्मरणपत्रे मिळवा',
+        'mobile_access_title': 'मोबाइल अॅप प्रवेश',
+        'mobile_access_desc': 'ऑफलाइन आरोग्य डेटा पाहण्यासह सर्व वैशिष्ट्यांमध्ये प्रवेश करण्यासाठी आमचे एंड्रॉइड अॅप डाउनलोड करा',
+        'emergency_title': 'आपत्कालीन प्राथमिक वैद्यकीय मदत',
+        'emergency_subtitle': 'मदत येईपर्यंत त्वरित मार्गदर्शन',
+        'india_emergency': 'भारत आपत्कालीन क्रमांक',
+        'ambulance': 'रुग्णवाहिका:',
+        'police': 'पोलीस:',
+        'fire': 'अग्निशमन:',
+        'heart_attack': 'हृदयविकाराचा झटका',
+        'stroke_fast': 'स्ट्रोक (FAST पद्धत)',
+        'breathing_difficulty': 'गंभीर श्वास घेण्यात अडचण',
+        'diabetic_emergency': 'मधुमेह आपत्काल (कमी साखर)',
+        'tap_first_aid': 'प्राथमिक वैद्यकीय पायऱ्यांसाठी टॅप करा',
+    },
+    'தமிழ்': {
+        'site_title': 'ஹெல்த்கேர் ஏஐ',
+        'site_subtitle': 'முன்கூட்டியே கண்டறிதல் • ஏஐ நுண்ணறிவு • தனியுரிமை முதலில்',
+        'trusted_platform': 'நம்பகமான சுகாதார தளம்',
+        'hero_title': 'உங்கள் ஆரோக்கியம், எங்கள் முன்னுரிமை',
+        'hero_subtitle': 'இந்திய குடும்பங்களுக்கான ஏஐ-இயங்கும் ஆரம்ப நோய் கண்டறிதல்।\nஉங்கள் மொழியில் தனிப்பயனாக்கப்பட்ட நுண்ணறிவு।',
+        'privacy_badge': '🛡️ தனியுரிமை பாதுகாக்கப்பட்டது',
+        'languages_badge': '🌐 6 மொழிகள்',
+        'privacy_notice': '🔒 உங்கள் மருத்துவ தரவு குறியாக்கம் செய்யப்பட்டது, தனிப்பட்டது மற்றும் ஒருபோதும் பகிரப்படவில்லை।',
+        'get_started': '🚀 தொடங்குங்கள் (உள்நுழைவு)',
+        'try_chatbot': '💬 ஏஐ சாட்பாட்டை முயற்சிக்கவும்',
+        'start_assessment': '🏥 சுகாதார மதிப்பீட்டைத் தொடங்கவும்',
+        'our_features': 'எங்கள் அம்சங்கள்',
+        'features_subtitle': 'உங்களுக்காக வடிவமைக்கப்பட்ட விரிவான ஏஐ-இயங்கும் சுகாதார தளம்',
+        'smart_ai_title': 'ஸ்மார்ட் ஏஐ உதவியாளர்',
+        'smart_ai_desc': 'தனிப்பயனாக்கப்பட்ட ஆரோக்கிய நுண்ணறிவுக்காக உங்கள் சுயவிவரத் தரவைப் பயன்படுத்தி இலக்கு வைத்த கேள்விகளைக் கேட்கிறது',
+        'privacy_title': 'தனியுரிமை பாதுகாக்கப்பட்டது',
+        'privacy_desc': 'உங்கள் மருத்துவ தரவு குறியாக்கம் செய்யப்பட்டுள்ளது, உள்நாட்டில் சேமிக்கப்பட்டுள்ளது மற்றும் மூன்றாம் தரப்பினருடன் பகிரப்படுவதில்லை',
+        'early_detection_title': 'முன்கூட்டியே கண்டறிதல்',
+        'early_detection_desc': 'ஏஐ-உதவி வடிவ அங்கீகாரம் மற்றும் நிபுணர் வழிகாட்டுதலுடன் ஆரோக்கிய அபாயங்களை முன்கூட்டியே அடையாளம் காணவும்',
+        'health_assessments': 'சுகாதார மதிப்பீடுகள்',
+        'assessments_subtitle': 'மேலும் அறிய மற்றும் உங்கள் ஏஐ-உதவி மதிப்பீட்டைத் தொடங்க ஒரு நிலையைத் தேர்ந்தெடுக்கவும்',
+        'diabetes': 'நீரிழிவு',
+        'skin_diseases': 'தோல் நோய்கள்',
+        'heart_health': 'இதய ஆரோக்கியம்',
+        'respiratory': 'சுவாச ஆரோக்கியம்',
+        'common_symptoms': 'பொதுவான அறிகுறிகள்:',
+        'risk_factors': 'ஆபத்து காரணிகள்:',
+        'prevention_tips': 'தடுப்பு குறிப்புகள்:',
+        'warning_signs': 'எச்சரிக்கை அறிகுறிகள்:',
+        'when_seek_help': 'எப்போது உதவி பெறுவது:',
+        'common_conditions': 'பொதுவான சுவாச நிலைமைகள்:',
+        'chatbot_features': 'ஏஐ சாட்பாட் அம்சங்கள்',
+        'chatbot_subtitle': 'அறிவார்ந்த, தனிப்பயனாக்கப்பட்ட சுகாதார உரையாடல்களை அனுபவிக்கவும்',
+        'intelligent_conv': 'அறிவார்ந்த உரையாடல்கள்',
+        'intelligent_desc': 'மேம்பட்ட இயற்கை மொழி செயலாக்கம் உங்கள் ஆரோக்கிய கவலைகளைப் புரிந்துகொள்கிறது மற்றும் உங்கள் பதில்களின் அடிப்படையில் தொடர்புடைய பின்தொடர்தல் கேள்விகளைக் கேட்கிறது',
+        'personalized_insights': 'தனிப்பயனாக்கப்பட்ட நுண்ணறிவு',
+        'personalized_desc': 'தனிப்பயனாக்கப்பட்ட பரிந்துரைகள் மற்றும் ஆரோக்கிய அபாய மதிப்பீடுகளை வழங்க உங்கள் ஆரோக்கிய சுயவிவரம், வாழ்க்கை முறை பழக்கவழக்கங்கள் மற்றும் மருத்துவ வரலாற்றைப் பயன்படுத்துகிறது',
+        'multi_language': 'பல-மொழி ஆதரவு',
+        'multi_language_desc': 'உங்கள் விருப்பமான மொழியில் தொடர்பு கொள்ளுங்கள்: ஆங்கிலம், இந்தி, மராத்தி, தமிழ், தெலுங்கு மற்றும் வங்காளம்',
+        'footer_about': 'ஹெல்த்கேர் ஏஐ பற்றி',
+        'footer_about_text': 'இந்திய பயனர்களுக்கான ஆரம்ப நோய் கண்டறிதல் மற்றும் தனிப்பயனாக்கப்பட்ட ஆரோக்கிய நுண்ணறிவுக்காக வடிவமைக்கப்பட்ட ஏஐ-இயங்கும் சுகாதார தளம். தொழில்நுட்பத்தின் மூலம் அனைவருக்கும் தரமான சுகாதாரத்தை அணுகக்கூடியதாக்குவதே எங்கள் நோக்கம்।',
+        'footer_languages': 'ஆதரிக்கப்படும் மொழிகள்',
+        'footer_disclaimer': 'முக்கிய மறுப்பு',
+        'footer_disclaimer_text': 'இது கல்வி நோக்கங்களுக்கான ஒரு முன்மாதிரி. வழங்கப்பட்ட தகவல் தொழில்முறை மருத்துவ ஆலோசனைக்கு மாற்றாக இல்லை. மருத்துவ நோயறிதல் மற்றும் சிகிச்சைக்கு எப்போதும் தகுதிவாய்ந்த சுகாதார நிபுணர்களை அணுகவும்।',
+        'footer_copyright': '© 2026 ஹெல்த்கேர் ஏஐ. தனியுரிமை-முதல் சுகாதார தொழில்நுட்பம்।\nஉங்கள் ஆரோக்கிய தரவு குறியாக்கம் செய்யப்பட்டுள்ளது மற்றும் மூன்றாம் தரப்பினருடன் ஒருபோதும் பகிரப்படவில்லை।',
+        'download_app': '📱 எங்கள் மொபைல் ஆப்ஸைப் பதிவிறக்கவும்',
+        'download_text': 'சிறந்த அனுபவம் மற்றும் அனைத்து அம்சங்களை அணுக:\nஏஐ சாட்பாட், சுகாதார மதிப்பீடுகள் மற்றும் தனிப்பயனாக்கப்பட்ட நுண்ணறிவு\n\nதயவுசெய்து Google Play Store இலிருந்து எங்கள் மொபைல் பயன்பாட்டைப் பதிவிறக்கவும்।',
+        'download_button': '📥 Google Play Store இலிருந்து பதிவிறக்கவும்',
+        'app_features': '🌟 கிடைக்கும் ஆப்ஸ் அம்சங்கள்:',
+        'app_note': '📌 குறிப்பு: முழு சாட்பாட் அனுபவம் மற்றும் ஊடாடும் அம்சங்கள் சிறந்த பயனர் அனுபவத்திற்காக எங்கள் மொபைல் ஆப்ஸில் மட்டுமே கிடைக்கும்।',
+        'back_home': '← முகப்புக்குத் திரும்பு',
+        'login_title': 'தொடர உள்நுழைக',
+        'login_subtitle': 'தொடங்க உங்கள் ஆரோக்கிய சுயவிவரத்தை முடிக்கவும்',
+        'login_text': 'உங்கள் ஆரோக்கிய நுண்ணறிவை பாதுகாப்பாக தனிப்பயனாக்க உள்நுழைவு உதவுகிறது।',
+        'basic_info': '1️⃣ அடிப்படை தகவல்',
+        'preferred_language': 'விருப்பமான மொழி *',
+        'email': 'மின்னஞ்சல் *',
+        'age': 'வயது *',
+        'gender': 'பாலினம் (விருப்பமானது)',
+        'physical_measurements': '2️⃣ உடல் அளவீடுகள் (விருப்பமானது)',
+        'height': 'உயரம் (செ.மீ)',
+        'weight': 'எடை (கிலோ)',
+        'lifestyle_habits': '3️⃣ வாழ்க்கை முறை மற்றும் பழக்கவழக்கங்கள் (விருப்பமானது)',
+        'lifestyle': 'வாழ்க்கை முறை',
+        'smoking_status': 'புகைபிடித்தல் நிலை',
+        'alcohol_consumption': 'மது நுகர்வு',
+        'exercise_frequency': 'உடற்பயிற்சி அதிர்வெண்',
+        'diet_type': 'உணவு வகை',
+        'sleep': 'சராசரி தூக்கம் (மணிநேரங்கள்/இரவு)',
+        'stress_level': 'மன அழுத்த நிலை',
+        'medical_history': '4️⃣ மருத்துவ வரலாறு (விருப்பமானது)',
+        'known_conditions': 'அறியப்பட்ட மருத்துவ நிலைமைகள்',
+        'family_history': 'நோய்களின் குடும்ப வரலாறு',
+        'login_button': 'உள்நுழைந்து ஆப்ஸில் தொடரவும்',
+        'required_fields': '⚠️ தயவுசெய்து அனைத்து தேவையான புலங்களை நிரப்பவும் (மின்னஞ்சல் மற்றும் வயது)',
+        'emergency_mode': '🚨 அவசர பயன்முறை',
+        'skin_conditions_title': 'பொதுவான தோல் நிலைமைகள்:',
+        'heart_habits_title': 'இதய-ஆரோக்கியமான பழக்கங்கள்:',
+        'data_driven_title': 'தரவு-இயக்கப்பட்ட நுண்ணறிவு',
+        'data_driven_desc': 'ஏஐ உங்கள் ஆரோக்கிய தரவில் உள்ள வடிவங்களை பகுப்பாய்வு செய்து ஆரம்ப எச்சரிக்கை அறிகுறிகள் மற்றும் தடுப்பு ஆரோக்கிய பரிந்துரைகளை வழங்குகிறது',
+        'health_reminders_title': 'ஆரோக்கிய நினைவூட்டல்கள்',
+        'health_reminders_desc': 'உங்கள் ஆரோக்கிய சுயவிவரத்தின் அடிப்படையில் மருந்து, ஆரோக்கிய பரிசோதனைகள் மற்றும் வாழ்க்கை முறை மாற்றங்களுக்கு சரியான நேரத்தில் நினைவூட்டல்களைப் பெறுங்கள்',
+        'mobile_access_title': 'மொபைல் ஆப்ஸ் அணுகல்',
+        'mobile_access_desc': 'ஆஃப்லைன் ஆரோக்கிய தரவு பார்வை உட்பட அனைத்து அம்சங்களுக்கும் பயணத்தில் அணுகலுக்கு எங்கள் ஆண்ட்ராய்டு ஆப்ஸை பதிவிறக்கவும்',
+        'emergency_title': 'அவசர முதலுதவி',
+        'emergency_subtitle': 'உதவி வரும் வரை விரைவான வழிகாட்டுதல்',
+        'india_emergency': 'இந்திய அவசர எண்கள்',
+        'ambulance': 'ஆம்புலன்ஸ்:',
+        'police': 'காவல்துறை:',
+        'fire': 'தீயணைப்பு:',
+        'heart_attack': 'மாரடைப்பு',
+        'stroke_fast': 'பக்கவாதம் (FAST முறை)',
+        'breathing_difficulty': 'கடுமையான சுவாச சிரமம்',
+        'diabetic_emergency': 'நீரிழிவு அவசரநிலை (குறைந்த சர்க்கரை)',
+        'tap_first_aid': 'முதலுதவி படிகளுக்கு தட்டவும்',
+    },
+    'తెలుగు': {
+        'site_title': 'హెల్త్‌కేర్ ఏఐ',
+        'site_subtitle': 'ముందస్తు గుర్తింపు • ఏఐ అంతర్దృష్టులు • గోప్యత మొదట',
+        'trusted_platform': 'నమ్మదగిన ఆరోగ్య సంరక్షణ వేదిక',
+        'hero_title': 'మీ ఆరోగ్యం, మా ప్రాధాన్యత',
+        'hero_subtitle': 'భారతీయ కుటుంబాల కోసం ఏఐ-శక్తితో కూడిన ముందస్తు వ్యాధి గుర్తింపు।\nమీ భాషలో వ్యక్తిగతీకరించిన అంతర్దృష్టులు।',
+        'privacy_badge': '🛡️ గోప్యత రక్షించబడింది',
+        'languages_badge': '🌐 6 భాషలు',
+        'privacy_notice': '🔒 మీ వైద్య డేటా ఎన్‌క్రిప్ట్ చేయబడింది, ప్రైవేట్ మరియు ఎప్పుడూ భాగస్వామ్యం చేయబడదు।',
+        'get_started': '🚀 ప్రారంభించండి (లాగిన్)',
+        'try_chatbot': '💬 ఏఐ చాట్‌బాట్ ప్రయత్నించండి',
+        'start_assessment': '🏥 ఆరోగ్య అంచనా ప్రారంభించండి',
+        'our_features': 'మా లక్షణాలు',
+        'features_subtitle': 'మీ కోసం రూపొందించబడిన సమగ్ర ఏఐ-శక్తితో కూడిన ఆరోగ్య వేదిక',
+        'smart_ai_title': 'స్మార్ట్ ఏఐ సహాయకుడు',
+        'smart_ai_desc': 'వ్యక్తిగతీకరించిన ఆరోగ్య అంతర్దృష్టుల కోసం మీ ప్రొఫైల్ డేటాను ఉపయోగించి లక్ష్య ప్రశ్నలను అడుగుతుంది',
+        'privacy_title': 'గోప్యత రక్షించబడింది',
+        'privacy_desc': 'మీ వైద్య డేటా ఎన్‌క్రిప్ట్ చేయబడింది, స్థానికంగా నిల్వ చేయబడింది మరియు ఎప్పుడూ మూడవ పక్షాలతో భాగస్వామ్యం చేయబడదు',
+        'early_detection_title': 'ముందస్తు గుర్తింపు',
+        'early_detection_desc': 'ఏఐ-సహాయక నమూనా గుర్తింపు మరియు నిపుణుల మార్గదర్శకత్వంతో ఆరోగ్య ప్రమాదాలను ముందుగానే గుర్తించండి',
+        'health_assessments': 'ఆరోగ్య అంచనాలు',
+        'assessments_subtitle': 'మరింత తెలుసుకోవడానికి మరియు మీ ఏఐ-సహాయక అంచనాను ప్రారంభించడానికి పరిస్థితిని ఎంచుకోండి',
+        'diabetes': 'మధుమేహం',
+        'skin_diseases': 'చర్మ వ్యాధులు',
+        'heart_health': 'గుండె ఆరోగ్యం',
+        'respiratory': 'శ్వాసకోశ ఆరోగ్యం',
+        'common_symptoms': 'సాధారణ లక్షణాలు:',
+        'risk_factors': 'ప్రమాద కారకాలు:',
+        'prevention_tips': 'నివారణ చిట్కాలు:',
+        'warning_signs': 'హెచ్చరిక సంకేతాలు:',
+        'when_seek_help': 'సహాయం ఎప్పుడు తీసుకోవాలి:',
+        'common_conditions': 'సాధారణ శ్వాసకోశ పరిస్థితులు:',
+        'chatbot_features': 'ఏఐ చాట్‌బాట్ లక్షణాలు',
+        'chatbot_subtitle': 'తెలివైన, వ్యక్తిగతీకరించిన ఆరోగ్య సంభాషణలను అనుభవించండి',
+        'intelligent_conv': 'తెలివైన సంభాషణలు',
+        'intelligent_desc': 'అధునాతన సహజ భాషా ప్రాసెసింగ్ మీ ఆరోగ్య ఆందోళనలను అర్థం చేసుకుంటుంది మరియు మీ ప్రతిస్పందనల ఆధారంగా సంబంధిత ఫాలో-అప్ ప్రశ్నలను అడుగుతుంది',
+        'personalized_insights': 'వ్యక్తిగతీకరించిన అంతర్దృష్టులు',
+        'personalized_desc': 'అనుకూలీకరించిన సిఫార్సులు మరియు ఆరోగ్య ప్రమాద అంచనాలను అందించడానికి మీ ఆరోగ్య ప్రొఫైల్, జీవనశైలి అలవాట్లు మరియు వైద్య చరిత్రను ఉపయోగిస్తుంది',
+        'multi_language': 'బహుళ-భాషా మద్దతు',
+        'multi_language_desc': 'మీ ఇష్ట భాషలో కమ్యూనికేట్ చేయండి: ఇంగ్లీష్, హిందీ, మరాఠీ, తమిళం, తెలుగు మరియు బెంగాలీ',
+        'footer_about': 'హెల్త్‌కేర్ ఏఐ గురించి',
+        'footer_about_text': 'భారతీయ వినియోగదారుల కోసం ముందస్తు వ్యాధి గుర్తింపు మరియు వ్యక్తిగతీకరించిన ఆరోగ్య అంతర్దృష్టుల కోసం రూపొందించబడిన ఏఐ-శక్తితో కూడిన ఆరోగ్య సంరక్షణ వేదిక। మా లక్ష్యం సాంకేతికత ద్వారా అందరికీ నాణ్యమైన ఆరోగ్య సంరక్షణను అందుబాటులో ఉంచడం।',
+        'footer_languages': 'మద్దతు ఉన్న భాషలు',
+        'footer_disclaimer': 'ముఖ్యమైన నిరాకరణ',
+        'footer_disclaimer_text': 'ఇది విద్యాపరమైన ప్రయోజనాల కోసం ఒక నమూనా। అందించిన సమాచారం వృత్తిపరమైన వైద్య సలహాకు ప్రత్యామ్నాయం కాదు। వైద్య రోగనిర్ధారణ మరియు చికిత్స కోసం ఎల్లప్పుడూ అర్హత కలిగిన ఆరోగ్య సంరక్షణ నిపుణులను సంప్రదించండి।',
+        'footer_copyright': '© 2026 హెల్త్‌కేర్ ఏఐ। గోప్యత-మొదటి ఆరోగ్య సంరక్షణ సాంకేతికత।\nమీ ఆరోగ్య డేటా ఎన్‌క్రిప్ట్ చేయబడింది మరియు ఎప్పుడూ మూడవ పక్షాలతో భాగస్వామ్యం చేయబడదు।',
+        'download_app': '📱 మా మొబైల్ యాప్‌ను డౌన్‌లోడ్ చేయండి',
+        'download_text': 'ఉత్తమ అనుభవం మరియు అన్ని లక్షణాలకు ప్రాప్యత కోసం:\nఏఐ చాట్‌బాట్, ఆరోగ్య అంచనాలు మరియు వ్యక్తిగతీకరించిన అంతర్దృష్టులు\n\nదయచేసి Google Play Store నుండి మా మొబైల్ అప్లికేషన్‌ను డౌన్‌లోడ్ చేయండి।',
+        'download_button': '📥 Google Play Store నుండి డౌన్‌లోడ్ చేయండి',
+        'app_features': '🌟 అందుబాటులో ఉన్న యాప్ లక్షణాలు:',
+        'app_note': '📌 గమనిక: పూర్తి చాట్‌బాట్ అనుభవం మరియు ఇంటరాక్టివ్ ఫీచర్లు ఉత్తమ వినియోగదారు అనుభవం కోసం మా మొబైల్ యాప్‌లో మాత్రమే అందుబాటులో ఉన్నాయి।',
+        'back_home': '← హోమ్‌కు తిరిగి వెళ్ళండి',
+        'login_title': 'కొనసాగించడానికి లాగిన్ చేయండి',
+        'login_subtitle': 'ప్రారంభించడానికి మీ ఆరోగ్య ప్రొఫైల్‌ను పూర్తి చేయండి',
+        'login_text': 'లాగిన్ మీ ఆరోగ్య అంతర్దృష్టులను సురక్షితంగా వ్యక్తిగతీకరించడంలో సహాయపడుతుంది।',
+        'basic_info': '1️⃣ ప్రాథమిక సమాచారం',
+        'preferred_language': 'ఇష్ట భాష *',
+        'email': 'ఇమెయిల్ *',
+        'age': 'వయస్సు *',
+        'gender': 'లింగం (ఐచ్ఛికం)',
+        'physical_measurements': '2️⃣ భౌతిక కొలతలు (ఐచ్ఛికం)',
+        'height': 'ఎత్తు (సెం.మీ)',
+        'weight': 'బరువు (కిలో)',
+        'lifestyle_habits': '3️⃣ జీవనశైలి మరియు అలవాట్లు (ఐచ్ఛికం)',
+        'lifestyle': 'జీవనశైలి',
+        'smoking_status': 'ధూమపాన స్థితి',
+        'alcohol_consumption': 'మద్యం వినియోగం',
+        'exercise_frequency': 'వ్యాయామ పౌనఃపున్యం',
+        'diet_type': 'ఆహార రకం',
+        'sleep': 'సగటు నిద్ర (గంటలు/రాత్రి)',
+        'stress_level': 'ఒత్తిడి స్థాయి',
+        'medical_history': '4️⃣ వైద్య చరిత్ర (ఐచ్ఛికం)',
+        'known_conditions': 'తెలిసిన వైద్య పరిస్థితులు',
+        'family_history': 'వ్యాధుల కుటుంబ చరిత్ర',
+        'login_button': 'లాగిన్ చేసి యాప్‌లో కొనసాగించండి',
+        'required_fields': '⚠️ దయచేసి అన్ని అవసరమైన ఫీల్డ్‌లను పూరించండి (ఇమెయిల్ మరియు వయస్సు)',
+        'emergency_mode': '🚨 అత్యవసర మోడ్',
+        'skin_conditions_title': 'సాధారణ చర్మ పరిస్థితులు:',
+        'heart_habits_title': 'హృదయ-ఆరోగ్యకరమైన అలవాట్లు:',
+        'data_driven_title': 'డేటా-ఆధారిత అంతర్దృష్టులు',
+        'data_driven_desc': 'ఏఐ మీ ఆరోగ్య డేటాలోని నమూనాలను విశ్లేషిస్తుంది మరియు ముందస్తు హెచ్చరిక సంకేతాలు మరియు నివారణ ఆరోగ్య సిఫార్సులను అందిస్తుంది',
+        'health_reminders_title': 'ఆరోగ్య రిమైండర్లు',
+        'health_reminders_desc': 'మీ ఆరోగ్య ప్రొఫైల్ ఆధారంగా మందులు, ఆరోగ్య పరీక్షలు మరియు జీవనశైలి మార్పుల కోసం సకాలంలో రిమైండర్లను పొందండి',
+        'mobile_access_title': 'మొబైల్ యాప్ యాక్సెస్',
+        'mobile_access_desc': 'ఆఫ్‌లైన్ ఆరోగ్య డేటా వీక్షణతో సహా అన్ని ఫీచర్లకు ప్రయాణంలో యాక్సెస్ కోసం మా ఆండ్రాయిడ్ యాప్‌ను డౌన్‌లోడ్ చేయండి',
+        'emergency_title': 'అత్యవసర ప్రథమ చికిత్స',
+        'emergency_subtitle': 'సహాయం వచ్చే వరకు త్వరిత మార్గదర్శకత్వం',
+        'india_emergency': 'భారతదేశ అత్యవసర నంబర్లు',
+        'ambulance': 'అంబులెన్స్:',
+        'police': 'పోలీస్:',
+        'fire': 'అగ్నిమాపక:',
+        'heart_attack': 'గుండెపోటు',
+        'stroke_fast': 'స్ట్రోక్ (FAST పద్ధతి)',
+        'breathing_difficulty': 'తీవ్రమైన శ్వాస ఇబ్బంది',
+        'diabetic_emergency': 'డయాబెటిక్ అత్యవసర పరిస్థితి (తక్కువ చక్కెర)',
+        'tap_first_aid': 'ప్రథమ చికిత్స దశల కోసం నొక్కండి',
+    },
+    'বাংলা': {
+        'site_title': 'হেলথকেয়ার এআই',
+        'site_subtitle': 'প্রাথমিক সনাক্তকরণ • এআই অন্তর্দৃষ্টি • গোপনীয়তা প্রথম',
+        'trusted_platform': 'বিশ্বস্ত স্বাস্থ্যসেবা প্ল্যাটফর্ম',
+        'hero_title': 'আপনার স্বাস্থ্য, আমাদের অগ্রাধিকার',
+        'hero_subtitle': 'ভারতীয় পরিবারের জন্য এআই-চালিত প্রাথমিক রোগ সনাক্তকরণ।\nআপনার ভাষায় ব্যক্তিগতকৃত অন্তর্দৃষ্টি।',
+        'privacy_badge': '🛡️ গোপনীয়তা সুরক্ষিত',
+        'languages_badge': '🌐 ৬টি ভাষা',
+        'privacy_notice': '🔒 আপনার চিকিৎসা ডেটা এনক্রিপ্ট করা, ব্যক্তিগত এবং কখনও শেয়ার করা হয় না।',
+        'get_started': '🚀 শুরু করুন (লগইন)',
+        'try_chatbot': '💬 এআই চ্যাটবট চেষ্টা করুন',
+        'start_assessment': '🏥 স্বাস্থ্য মূল্যায়ন শুরু করুন',
+        'our_features': 'আমাদের বৈশিষ্ট্য',
+        'features_subtitle': 'আপনার জন্য ডিজাইন করা ব্যাপক এআই-চালিত স্বাস্থ্য প্ল্যাটফর্ম',
+        'smart_ai_title': 'স্মার্ট এআই সহায়ক',
+        'smart_ai_desc': 'ব্যক্তিগতকৃত স্বাস্থ্য অন্তর্দৃষ্টির জন্য আপনার প্রোফাইল ডেটা ব্যবহার করে লক্ষ্যবদ্ধ প্রশ্ন জিজ্ঞাসা করে',
+        'privacy_title': 'গোপনীয়তা সুরক্ষিত',
+        'privacy_desc': 'আপনার চিকিৎসা ডেটা এনক্রিপ্ট করা, স্থানীয়ভাবে সংরক্ষিত এবং কখনও তৃতীয় পক্ষের সাথে শেয়ার করা হয় না',
+        'early_detection_title': 'প্রাথমিক সনাক্তকরণ',
+        'early_detection_desc': 'এআই-সহায়তা প্যাটার্ন স্বীকৃতি এবং বিশেষজ্ঞ নির্দেশনা সহ স্বাস্থ্য ঝুঁকি প্রাথমিকভাবে চিহ্নিত করুন',
+        'health_assessments': 'স্বাস্থ্য মূল্যায়ন',
+        'assessments_subtitle': 'আরও জানতে এবং আপনার এআই-সহায়তা মূল্যায়ন শুরু করতে একটি অবস্থা নির্বাচন করুন',
+        'diabetes': 'ডায়াবেটিস',
+        'skin_diseases': 'ত্বকের রোগ',
+        'heart_health': 'হৃদয় স্বাস্থ্য',
+        'respiratory': 'শ্বাসযন্ত্রের স্বাস্থ্য',
+        'common_symptoms': 'সাধারণ লক্ষণ:',
+        'risk_factors': 'ঝুঁকির কারণ:',
+        'prevention_tips': 'প্রতিরোধ টিপস:',
+        'warning_signs': 'সতর্কতা চিহ্ন:',
+        'when_seek_help': 'কখন সাহায্য নিতে হবে:',
+        'common_conditions': 'সাধারণ শ্বাসযন্ত্রের অবস্থা:',
+        'chatbot_features': 'এআই চ্যাটবট বৈশিষ্ট্য',
+        'chatbot_subtitle': 'বুদ্ধিমান, ব্যক্তিগতকৃত স্বাস্থ্য কথোপকথন অনুভব করুন',
+        'intelligent_conv': 'বুদ্ধিমান কথোপকথন',
+        'intelligent_desc': 'উন্নত প্রাকৃতিক ভাষা প্রক্রিয়াকরণ আপনার স্বাস্থ্য উদ্বেগ বোঝে এবং আপনার প্রতিক্রিয়ার ভিত্তিতে প্রাসঙ্গিক ফলো-আপ প্রশ্ন জিজ্ঞাসা করে',
+        'personalized_insights': 'ব্যক্তিগতকৃত অন্তর্দৃষ্টি',
+        'personalized_desc': 'কাস্টমাইজড সুপারিশ এবং স্বাস্থ্য ঝুঁকি মূল্যায়ন প্রদান করতে আপনার স্বাস্থ্য প্রোফাইল, জীবনযাত্রার অভ্যাস এবং চিকিৎসা ইতিহাস ব্যবহার করে',
+        'multi_language': 'বহু-ভাষা সমর্থন',
+        'multi_language_desc': 'আপনার পছন্দের ভাষায় যোগাযোগ করুন: ইংরেজি, হিন্দি, মারাঠি, তামিল, তেলুগু এবং বাংলা',
+        'footer_about': 'হেলথকেয়ার এআই সম্পর্কে',
+        'footer_about_text': 'ভারতীয় ব্যবহারকারীদের জন্য প্রাথমিক রোগ সনাক্তকরণ এবং ব্যক্তিগতকৃত স্বাস্থ্য অন্তর্দৃষ্টির জন্য ডিজাইন করা এআই-চালিত স্বাস্থ্যসেবা প্ল্যাটফর্ম। আমাদের লক্ষ্য প্রযুক্তির মাধ্যমে সকলের জন্য মানসম্মত স্বাস্থ্যসেবা অ্যাক্সেসযোগ্য করা।',
+        'footer_languages': 'সমর্থিত ভাষা',
+        'footer_disclaimer': 'গুরুত্বপূর্ণ দাবিত্যাগ',
+        'footer_disclaimer_text': 'এটি শিক্ষামূলক উদ্দেশ্যে একটি প্রোটোটাইপ। প্রদত্ত তথ্য পেশাদার চিকিৎসা পরামর্শের বিকল্প নয়। চিকিৎসা নির্ণয় এবং চিকিৎসার জন্য সর্বদা যোগ্য স্বাস্থ্যসেবা পেশাদারদের সাথে পরামর্শ করুন।',
+        'footer_copyright': '© ২০২৬ হেলথকেয়ার এআই। গোপনীয়তা-প্রথম স্বাস্থ্যসেবা প্রযুক্তি।\nআপনার স্বাস্থ্য ডেটা এনক্রিপ্ট করা এবং কখনও তৃতীয় পক্ষের সাথে শেয়ার করা হয় না।',
+        'download_app': '📱 আমাদের মোবাইল অ্যাপ ডাউনলোড করুন',
+        'download_text': 'সেরা অভিজ্ঞতা এবং সমস্ত বৈশিষ্ট্য অ্যাক্সেস করতে:\nএআই চ্যাটবট, স্বাস্থ্য মূল্যায়ন এবং ব্যক্তিগতকৃত অন্তর্দৃষ্টি\n\nঅনুগ্রহ করে Google Play Store থেকে আমাদের মোবাইল অ্যাপ্লিকেশন ডাউনলোড করুন।',
+        'download_button': '📥 Google Play Store থেকে ডাউনলোড করুন',
+        'app_features': '🌟 উপলব্ধ অ্যাপ বৈশিষ্ট্য:',
+        'app_note': '📌 নোট: সম্পূর্ণ চ্যাটবট অভিজ্ঞতা এবং ইন্টারেক্টিভ বৈশিষ্ট্যগুলি সেরা ব্যবহারকারী অভিজ্ঞতার জন্য শুধুমাত্র আমাদের মোবাইল অ্যাপে উপলব্ধ।',
+        'back_home': '← হোম এ ফিরে যান',
+        'login_title': 'চালিয়ে যেতে লগইন করুন',
+        'login_subtitle': 'শুরু করতে আপনার স্বাস্থ্য প্রোফাইল সম্পূর্ণ করুন',
+        'login_text': 'লগইন আপনার স্বাস্থ্য অন্তর্দৃষ্টি নিরাপদে ব্যক্তিগতকরণ করতে সাহায্য করে।',
+        'basic_info': '1️⃣ মৌলিক তথ্য',
+        'preferred_language': 'পছন্দের ভাষা *',
+        'email': 'ইমেল *',
+        'age': 'বয়স *',
+        'gender': 'লিঙ্গ (ঐচ্ছিক)',
+        'physical_measurements': '2️⃣ শারীরিক পরিমাপ (ঐচ্ছিক)',
+        'height': 'উচ্চতা (সেমি)',
+        'weight': 'ওজন (কেজি)',
+        'lifestyle_habits': '3️⃣ জীবনযাত্রা এবং অভ্যাস (ঐচ্ছিক)',
+        'lifestyle': 'জীবনযাত্রা',
+        'smoking_status': 'ধূমপান অবস্থা',
+        'alcohol_consumption': 'অ্যালকোহল সেবন',
+        'exercise_frequency': 'ব্যায়াম ফ্রিকোয়েন্সি',
+        'diet_type': 'খাদ্য ধরণ',
+        'sleep': 'গড় ঘুম (ঘন্টা/রাত)',
+        'stress_level': 'চাপ স্তর',
+        'medical_history': '4️⃣ চিকিৎসা ইতিহাস (ঐচ্ছিক)',
+        'known_conditions': 'পরিচিত চিকিৎসা অবস্থা',
+        'family_history': 'রোগের পারিবারিক ইতিহাস',
+        'login_button': 'লগইন করুন এবং অ্যাপে চালিয়ে যান',
+        'required_fields': '⚠️ অনুগ্রহ করে সমস্ত প্রয়োজনীয় ক্ষেত্র পূরণ করুন (ইমেল এবং বয়স)',
+        'emergency_mode': '🚨 জরুরী মোড',
+        'skin_conditions_title': 'সাধারণ ত্বকের অবস্থা:',
+        'heart_habits_title': 'হৃদয়-স্বাস্থ্যকর অভ্যাস:',
+        'data_driven_title': 'ডেটা-চালিত অন্তর্দৃষ্টি',
+        'data_driven_desc': 'এআই আপনার স্বাস্থ্য ডেটাতে প্যাটার্ন বিশ্লেষণ করে এবং প্রাথমিক সতর্কতা চিহ্ন এবং প্রতিরোধমূলক স্বাস্থ্য সুপারিশ প্রদান করে',
+        'health_reminders_title': 'স্বাস্থ্য অনুস্মারক',
+        'health_reminders_desc': 'আপনার স্বাস্থ্য প্রোফাইলের উপর ভিত্তি করে ওষুধ, স্বাস্থ্য পরীক্ষা এবং জীবনযাত্রার পরিবর্তনের জন্য সময়মত অনুস্মারক পান',
+        'mobile_access_title': 'মোবাইল অ্যাপ অ্যাক্সেস',
+        'mobile_access_desc': 'অফলাইন স্বাস্থ্য ডেটা দেখা সহ সমস্ত বৈশিষ্ট্যগুলিতে চলার সময় অ্যাক্সেসের জন্য আমাদের অ্যান্ড্রয়েড অ্যাপ ডাউনলোড করুন',
+        'emergency_title': 'জরুরি প্রাথমিক চিকিৎসা',
+        'emergency_subtitle': 'সাহায্য আসা পর্যন্ত দ্রুত নির্দেশনা',
+        'india_emergency': 'ভারত জরুরি নম্বর',
+        'ambulance': 'অ্যাম্বুলেন্স:',
+        'police': 'পুলিশ:',
+        'fire': 'ফায়ার:',
+        'heart_attack': 'হার্ট অ্যাটাক',
+        'stroke_fast': 'স্ট্রোক (FAST পদ্ধতি)',
+        'breathing_difficulty': 'গুরুতর শ্বাসকষ্ট',
+        'diabetic_emergency': 'ডায়াবেটিক জরুরী (কম চিনি)',
+        'tap_first_aid': 'প্রাথমিক চিকিৎসার ধাপের জন্য ট্যাপ করুন',
+    }
+}
+
+def get_text(key):
+    """Get translated text based on current language"""
+    return TRANSLATIONS[st.session_state.language].get(key, key)
+
+# ========================================
+# APP REDIRECT PAGE
+# ========================================
+def show_app_redirect():
+    """Show redirect message to download Android app"""
+    
+    # Header
+    st.markdown(f"""
+    <div class='header'>
+        <div class='header-title'>{get_text('site_title')}</div>
+        <div class='header-subtitle'>{get_text('site_subtitle')}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Redirect Container
+    col1, col2, col3 = st.columns([0.5, 2, 0.5])
+    
+    with col2:
+        st.markdown(f"""
+        <div class='app-redirect-container'>
+            <div class='app-redirect-title'>{get_text('download_app')}</div>
+            
+            <div class='app-redirect-text'>
+                {get_text('download_text')}
+            </div>
+            
+            <a href='https://play.google.com/store' class='download-button' target='_blank'>
+                {get_text('download_button')}
+            </a>
+            
+            <div class='app-features'>
+                <h3>{get_text('app_features')}</h3>
+                <ul>
+                    <li>✓ <strong>Smart AI Health Assistant</strong> - Chat with our intelligent health bot</li>
+                    <li>✓ <strong>Disease Risk Assessment</strong> - Get personalized health evaluations</li>
+                    <li>✓ <strong>Multi-language Support</strong> - Available in 6 Indian languages</li>
+                    <li>✓ <strong>Personalized Health Insights</strong> - Based on your profile and history</li>
+                    <li>✓ <strong>Secure & Private</strong> - Your data is encrypted and never shared</li>
+                </ul>
+            </div>
+            
+            <div style='margin-top: 2rem; padding: 1.5rem; background: #fff3cd; border-radius: 10px;'>
+                <strong>{get_text('app_note')}</strong>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    # Back button
+    col_back1, col_back2, col_back3 = st.columns([1, 1, 1])
+    with col_back2:
+        if st.button(get_text('back_home'), use_container_width=True):
+            st.session_state.page = 'home'
+            st.rerun()
+
+# ========================================
+# HOME PAGE
+# ========================================
+def home_page():
+    """Main home page with all information"""
+    
+    # Header with Language Selector
+    st.markdown(f"""
+    <div class='header'>
+        <div class='header-title'>{get_text('site_title')}</div>
+        <div class='header-subtitle'>{get_text('site_subtitle')}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Language Selector (visible at top)
+    st.markdown("<br>", unsafe_allow_html=True)
+    lang_col1, lang_col2, lang_col3 = st.columns([2, 1, 2])
+    with lang_col2:
+        language_options = ['English', 'हिन्दी', 'मराठी', 'தமிழ்', 'తెలుగు', 'বাংলা']
+        selected_language = st.selectbox(
+            "🌐 Select Language / भाषा चुनें",
+            language_options,
+            index=language_options.index(st.session_state.language) if st.session_state.language in language_options else 0,
+            key='language_selector_home'
+        )
+        if selected_language != st.session_state.language:
+            st.session_state.language = selected_language
+            st.rerun()
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Hero Section
+    hero_col1, hero_col2 = st.columns([1.3, 1])
+    
+    with hero_col1:
+        st.markdown(f"""
+        <div class='hero-section'>
+            <div class='hero-badge'>{get_text('trusted_platform')}</div>
+            <h1 class='hero-title'>{get_text('hero_title')}</h1>
+            <p class='hero-subtitle'>
+                {get_text('hero_subtitle')}
+            </p>
+            <span class='badge'>{get_text('privacy_badge')}</span>
+            <span class='badge'>{get_text('languages_badge')}</span>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with hero_col2:
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        # Indian doctor/healthcare professional image
+        st.image("https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=800&h=600&fit=crop", 
+                 use_container_width=True)
+    
+    # Privacy Notice
+    st.markdown(f"""
+    <div class='privacy-notice'>
+        {get_text('privacy_notice')}
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Navigation Buttons
+    st.markdown("<br>", unsafe_allow_html=True)
+    nav_col1, nav_col2, nav_col3 = st.columns(3)
+    
+    with nav_col1:
+        if st.button(get_text('get_started'), use_container_width=True, type="primary"):
+            st.session_state.page = 'login'
+            st.rerun()
+    
+    with nav_col2:
+        if st.button(get_text('start_assessment'), use_container_width=True):
+            st.session_state.page = 'assessments'
+            st.rerun()
+    
+    with nav_col3:
+        if st.button(get_text('emergency_mode'), use_container_width=True):
+            st.session_state.page = 'emergency'
+            st.rerun()
+    
+    # Features Section
+    st.markdown(f"""
+    <h2 class='section-title'>{get_text('our_features')}</h2>
+    <p class='section-subtitle'>{get_text('features_subtitle')}</p>
+    """, unsafe_allow_html=True)
+    
+    feat_col1, feat_col2, feat_col3 = st.columns(3)
+    
+    with feat_col1:
+        st.markdown(f"""
+        <div class='feature-card'>
+            <div class='feature-icon'>💬</div>
+            <div class='feature-title'>{get_text('smart_ai_title')}</div>
+            <div class='feature-desc'>
+                {get_text('smart_ai_desc')}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with feat_col2:
+        st.markdown(f"""
+        <div class='feature-card'>
+            <div class='feature-icon'>🛡️</div>
+            <div class='feature-title'>{get_text('privacy_title')}</div>
+            <div class='feature-desc'>
+                {get_text('privacy_desc')}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with feat_col3:
+        st.markdown(f"""
+        <div class='feature-card'>
+            <div class='feature-icon'>⏰</div>
+            <div class='feature-title'>{get_text('early_detection_title')}</div>
+            <div class='feature-desc'>
+                {get_text('early_detection_desc')}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Health Assessments Section
+    st.markdown(f"""
+    <h2 class='section-title'>{get_text('health_assessments')}</h2>
+    <p class='section-subtitle'>{get_text('assessments_subtitle')}</p>
+    """, unsafe_allow_html=True)
+    
+    # Dashboard preview
+    st.image("https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200&h=400&fit=crop", 
+             use_container_width=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Disease Cards - Row 1
+    disease_col1, disease_col2 = st.columns(2)
+    
+    with disease_col1:
+        # Diabetes Card
+        st.markdown(f"""
+        <div class='disease-card'>
+            <div class='disease-header diabetes-header'>
+                💉 {get_text('diabetes')}
+            </div>
+            <div class='disease-content'>
+                <h4>{get_text('common_symptoms')}</h4>
+                <ul>
+                    <li>Frequent urination (polyuria)</li>
+                    <li>Excessive thirst (polydipsia)</li>
+                    <li>Unexplained weight loss</li>
+                    <li>Increased hunger</li>
+                    <li>Blurred vision</li>
+                    <li>Slow-healing wounds</li>
+                    <li>Fatigue and weakness</li>
+                    <li>Tingling in hands or feet</li>
+                    <li>Frequent infections</li>
+                </ul>
+                <h4>{get_text('risk_factors')}</h4>
+                <ul>
+                    <li>Family history of diabetes</li>
+                    <li>Obesity or being overweight (BMI > 25)</li>
+                    <li>Sedentary lifestyle</li>
+                    <li>Age over 45 years</li>
+                    <li>High blood pressure (>140/90 mmHg)</li>
+                    <li>High cholesterol levels</li>
+                    <li>History of gestational diabetes</li>
+                    <li>Polycystic ovary syndrome (PCOS)</li>
+                </ul>
+                <h4>{get_text('prevention_tips')}</h4>
+                <ul>
+                    <li>Maintain healthy weight</li>
+                    <li>Regular physical exercise (30 min/day)</li>
+                    <li>Balanced diet with low sugar</li>
+                    <li>Regular health check-ups</li>
+                </ul>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with disease_col2:
+        # Skin Diseases Card
+        st.markdown(f"""
+        <div class='disease-card'>
+            <div class='disease-header skin-header'>
+                🔬 {get_text('skin_diseases')}
+            </div>
+            <div class='disease-content'>
+                <h4>{get_text('common_symptoms')}</h4>
+                <ul>
+                    <li>Unusual rashes or lesions</li>
+                    <li>Changes in mole appearance (ABCDE rule)</li>
+                    <li>Persistent itching or burning sensation</li>
+                    <li>Skin discoloration or dark patches</li>
+                    <li>Dry, cracked, or flaky skin</li>
+                    <li>Red, inflamed patches</li>
+                    <li>Unusual growths or bumps</li>
+                    <li>Painful or bleeding skin areas</li>
+                    <li>Pus-filled blisters</li>
+                </ul>
+                <h4>{get_text('when_seek_help')}</h4>
+                <ul>
+                    <li>Moles that change in size, shape, or color</li>
+                    <li>Persistent sores that don't heal (>4 weeks)</li>
+                    <li>Sudden or severe skin changes</li>
+                    <li>Signs of skin infection</li>
+                    <li>Painful or rapidly growing skin lesions</li>
+                    <li>Unexplained rashes spreading quickly</li>
+                </ul>
+                <h4>{get_text('skin_conditions_title')}</h4>
+                <ul>
+                    <li>Eczema (Atopic Dermatitis)</li>
+                    <li>Psoriasis</li>
+                    <li>Acne</li>
+                    <li>Fungal infections</li>
+                    <li>Vitiligo</li>
+                </ul>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Disease Cards - Row 2
+    disease_col3, disease_col4 = st.columns(2)
+    
+    with disease_col3:
+        # Heart Health Card
+        st.markdown(f"""
+        <div class='disease-card'>
+            <div class='disease-header heart-header'>
+                ❤️ {get_text('heart_health')}
+            </div>
+            <div class='disease-content'>
+                <h4>{get_text('warning_signs')}</h4>
+                <ul>
+                    <li>Chest pain or discomfort (angina)</li>
+                    <li>Shortness of breath</li>
+                    <li>Irregular or rapid heartbeat (palpitations)</li>
+                    <li>Fatigue and weakness</li>
+                    <li>Swelling in legs, ankles, or feet (edema)</li>
+                    <li>Dizziness or lightheadedness</li>
+                    <li>Pain in jaw, neck, back, or arms</li>
+                    <li>Cold sweats</li>
+                    <li>Nausea or indigestion</li>
+                </ul>
+                <h4>{get_text('risk_factors')}</h4>
+                <ul>
+                    <li>High cholesterol (LDL > 130 mg/dL)</li>
+                    <li>High blood pressure (>140/90 mmHg)</li>
+                    <li>Smoking or tobacco use</li>
+                    <li>Diabetes mellitus</li>
+                    <li>Family history of heart disease</li>
+                    <li>Obesity (BMI > 30)</li>
+                    <li>Lack of physical activity</li>
+                    <li>Excessive alcohol consumption</li>
+                    <li>Chronic stress</li>
+                    <li>Age (men >45, women >55)</li>
+                </ul>
+                <h4>{get_text('heart_habits_title')}</h4>
+                <ul>
+                    <li>Regular cardiovascular exercise</li>
+                    <li>Heart-healthy diet (low salt, low fat)</li>
+                    <li>Stress management</li>
+                    <li>Regular blood pressure monitoring</li>
+                </ul>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with disease_col4:
+        # Respiratory Card
+        st.markdown(f"""
+        <div class='disease-card'>
+            <div class='disease-header respiratory-header'>
+                🫁 {get_text('respiratory')}
+            </div>
+            <div class='disease-content'>
+                <h4>{get_text('common_symptoms')}</h4>
+                <ul>
+                    <li>Persistent cough (>3 weeks)</li>
+                    <li>Shortness of breath (dyspnea)</li>
+                    <li>Wheezing or whistling sound when breathing</li>
+                    <li>Chest tightness or pain</li>
+                    <li>Frequent respiratory infections</li>
+                    <li>Chronic mucus production</li>
+                    <li>Difficulty breathing during exercise</li>
+                    <li>Coughing up blood (hemoptysis)</li>
+                    <li>Rapid breathing (tachypnea)</li>
+                </ul>
+                <h4>{get_text('risk_factors')}</h4>
+                <ul>
+                    <li>Smoking or exposure to secondhand smoke</li>
+                    <li>Air pollution exposure</li>
+                    <li>Family history of lung disease</li>
+                    <li>Occupational hazards (asbestos, chemicals)</li>
+                    <li>Allergies and asthma</li>
+                    <li>Chronic respiratory infections</li>
+                    <li>Weakened immune system</li>
+                </ul>
+                <h4>{get_text('common_conditions')}</h4>
+                <ul>
+                    <li>Asthma</li>
+                    <li>Chronic Obstructive Pulmonary Disease (COPD)</li>
+                    <li>Bronchitis</li>
+                    <li>Pneumonia</li>
+                    <li>Tuberculosis (TB)</li>
+                </ul>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Chatbot Features Section
+    st.markdown(f"""
+    <h2 class='section-title'>{get_text('chatbot_features')}</h2>
+    <p class='section-subtitle'>{get_text('chatbot_subtitle')}</p>
+    """, unsafe_allow_html=True)
+    
+    chatbot_col1, chatbot_col2, chatbot_col3 = st.columns(3)
+    
+    with chatbot_col1:
+        st.markdown(f"""
+        <div class='feature-card'>
+            <div class='feature-icon'>🧠</div>
+            <div class='feature-title'>{get_text('intelligent_conv')}</div>
+            <div class='feature-desc'>
+                {get_text('intelligent_desc')}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with chatbot_col2:
+        st.markdown(f"""
+        <div class='feature-card'>
+            <div class='feature-icon'>🎯</div>
+            <div class='feature-title'>{get_text('personalized_insights')}</div>
+            <div class='feature-desc'>
+                {get_text('personalized_desc')}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with chatbot_col3:
+        st.markdown(f"""
+        <div class='feature-card'>
+            <div class='feature-icon'>🌍</div>
+            <div class='feature-title'>{get_text('multi_language')}</div>
+            <div class='feature-desc'>
+                {get_text('multi_language_desc')}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Additional Features
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    add_feat_col1, add_feat_col2, add_feat_col3 = st.columns(3)
+    
+    with add_feat_col1:
+        st.markdown(f"""
+        <div class='feature-card'>
+            <div class='feature-icon'>📊</div>
+            <div class='feature-title'>{get_text('data_driven_title')}</div>
+            <div class='feature-desc'>
+                {get_text('data_driven_desc')}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with add_feat_col2:
+        st.markdown(f"""
+        <div class='feature-card'>
+            <div class='feature-icon'>🔔</div>
+            <div class='feature-title'>{get_text('health_reminders_title')}</div>
+            <div class='feature-desc'>
+                {get_text('health_reminders_desc')}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with add_feat_col3:
+        st.markdown(f"""
+        <div class='feature-card'>
+            <div class='feature-icon'>📱</div>
+            <div class='feature-title'>{get_text('mobile_access_title')}</div>
+            <div class='feature-desc'>
+                {get_text('mobile_access_desc')}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # Footer
+    st.markdown(f"""
+    <div class='footer'>
+        <div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem;'>
+            <div class='footer-section'>
+                <div class='footer-title'>{get_text('footer_about')}</div>
+                <div class='footer-content'>
+                    {get_text('footer_about_text')}
+                </div>
+            </div>
+            <div class='footer-section'>
+                <div class='footer-title'>{get_text('footer_languages')}</div>
+                <div class='footer-content'>
+                    🌐 English<br>
+                    🌐 हिन्दी (Hindi)<br>
+                    🌐 मराठी (Marathi)<br>
+                    🌐 தமிழ் (Tamil)<br>
+                    🌐 తెలుగు (Telugu)<br>
+                    🌐 বাংলা (Bengali)
+                </div>
+            </div>
+            <div class='footer-section'>
+                <div class='footer-title'>{get_text('footer_disclaimer')}</div>
+                <div class='footer-content'>
+                    {get_text('footer_disclaimer_text')}
+                </div>
+            </div>
+        </div>
+        <div class='footer-bottom'>
+            {get_text('footer_copyright')}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ========================================
+# LOGIN PAGE
+# ========================================
+def login_page():
+    """Login page that redirects to app download"""
+    
+    # Header
+    st.markdown(f"""
+    <div class='header'>
+        <div class='header-title'>{get_text('site_title')}</div>
+        <div class='header-subtitle'>{get_text('site_subtitle')}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    # Login Form
+    col1, col2, col3 = st.columns([0.5, 2, 0.5])
+    
+    with col2:
+        st.markdown("""
+        <div class='login-container'>
+            <h2 class='login-title'>Login to Continue</h2>
+            <p class='login-subtitle'>Complete your health profile to get started</p>
+            <p style='text-align: center; color: #4a5568; margin-bottom: 2rem;'>
+                Login helps personalize your health insights securely.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        with st.form("login_form"):
+            # Section 1: Basic Information
+            st.markdown("<div class='section-header'>1️⃣ Basic Information</div>", unsafe_allow_html=True)
+            
+            language = st.selectbox(
+                "Preferred Language *",
+                ["English", "हिन्दी (Hindi)", "मराठी (Marathi)", 
+                 "தமிழ் (Tamil)", "తెలుగు (Telugu)", "বাংলা (Bengali)"]
+            )
+            
+            email = st.text_input("Email *", placeholder="your.email@example.com")
+            
+            col_age, col_gender = st.columns(2)
+            with col_age:
+                age = st.number_input("Age *", min_value=1, max_value=120, value=35)
+            with col_gender:
+                gender = st.selectbox("Gender (Optional)", 
+                                     ["Prefer not to say", "Male", "Female", "Other"])
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Section 2: Physical Measurements
+            st.markdown("<div class='section-header'>2️⃣ Physical Measurements (Optional)</div>", 
+                       unsafe_allow_html=True)
+            
+            col_height, col_weight = st.columns(2)
+            with col_height:
+                height = st.number_input("Height (cm)", min_value=50, max_value=250, value=170)
+            with col_weight:
+                weight = st.number_input("Weight (kg)", min_value=20, max_value=200, value=70)
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Section 3: Lifestyle & Habits
+            st.markdown("<div class='section-header'>3️⃣ Lifestyle & Habits (Optional)</div>", 
+                       unsafe_allow_html=True)
+            
+            lifestyle = st.selectbox("Lifestyle", 
+                                    ["Select...", "Sedentary", "Moderate", "Active", "Very Active"])
+            
+            col_smoke, col_alcohol = st.columns(2)
+            with col_smoke:
+                smoking = st.selectbox("Smoking Status", 
+                                      ["Select...", "Never", "Former", "Current"])
+            with col_alcohol:
+                alcohol = st.selectbox("Alcohol Consumption", 
+                                      ["Select...", "None", "Occasional", "Moderate", "Frequent"])
+            
+            col_exercise, col_diet = st.columns(2)
+            with col_exercise:
+                exercise = st.selectbox("Exercise Frequency", 
+                                       ["Select...", "Never", "1-2 times/week", 
+                                        "3-4 times/week", "5+ times/week"])
+            with col_diet:
+                diet = st.selectbox("Diet Type", 
+                                   ["Select...", "Vegetarian", "Non-Vegetarian", "Vegan", "Other"])
+            
+            col_sleep, col_stress = st.columns(2)
+            with col_sleep:
+                sleep = st.selectbox("Average Sleep (hours/night)", 
+                                    ["Select...", "<5 hours", "5-6 hours", 
+                                     "7-8 hours", "9+ hours"])
+            with col_stress:
+                stress = st.selectbox("Stress Level", 
+                                     ["Select...", "Low", "Moderate", "High", "Very High"])
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Section 4: Medical History
+            st.markdown("<div class='section-header'>4️⃣ Medical History (Optional)</div>", 
+                       unsafe_allow_html=True)
+            
+            medical_conditions = st.text_area(
+                "Known Medical Conditions",
+                placeholder="e.g., Hypertension, Asthma, Diabetes",
+                height=80
+            )
+            
+            st.markdown("<p style='font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem;'>Family History of Diseases</p>", 
+                       unsafe_allow_html=True)
+            
+            col_fam1, col_fam2 = st.columns(2)
+            with col_fam1:
+                diabetes_fam = st.checkbox("Diabetes")
+                cancer_fam = st.checkbox("Cancer")
+                stroke_fam = st.checkbox("Stroke")
+            with col_fam2:
+                heart_fam = st.checkbox("Heart Disease")
+                hypertension_fam = st.checkbox("Hypertension")
+                asthma_fam = st.checkbox("Asthma")
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # Privacy Notice
+            st.markdown("""
+            <div class='privacy-notice'>
+                🔒 Your medical data is encrypted, private, and never shared.
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Submit Button
+            submitted = st.form_submit_button("Login & Continue to App")
+            
+            if submitted:
+                if email and age:
+                    st.session_state.page = 'redirect'
+                    st.rerun()
+                else:
+                    st.error("⚠️ Please fill in all required fields (Email and Age)")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Back button
+        if st.button("← Back to Home", use_container_width=True):
+            st.session_state.page = 'home'
+            st.rerun()
+
+# ========================================
+# EMERGENCY MODE PAGE
+# ========================================
+def emergency_page():
+    """Emergency first aid page - works independently"""
+    
+    # Header with Language Selector
+    st.markdown(f"""
+    <div class='header'>
+        <div class='header-title'>{get_text('site_title')}</div>
+        <div class='header-subtitle'>{get_text('site_subtitle')}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Language Selector
+    st.markdown("<br>", unsafe_allow_html=True)
+    lang_col1, lang_col2, lang_col3 = st.columns([2, 1, 2])
+    with lang_col2:
+        language_options = ['English', 'हिन्दी', 'मराठी', 'தமிழ்', 'తెలుగు', 'বাংলা']
+        selected_language = st.selectbox(
+            "🌐 Select Language",
+            language_options,
+            index=language_options.index(st.session_state.language) if st.session_state.language in language_options else 0,
+            key='language_selector_emergency'
+        )
+        if selected_language != st.session_state.language:
+            st.session_state.language = selected_language
+            st.rerun()
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Emergency Title
+    st.markdown(f"""
+    <h1 style='text-align: center; color: #c53030; font-size: 3rem; margin-bottom: 1rem;'>
+        {get_text('emergency_title')}
+    </h1>
+    <p style='text-align: center; color: #4a5568; font-size: 1.3rem; margin-bottom: 3rem;'>
+        {get_text('emergency_subtitle')}
+    </p>
+    """, unsafe_allow_html=True)
+    
+    # Emergency Numbers Box
+    st.markdown(f"""
+    <div style='background: #fff5f5; border: 3px solid #fc8181; border-radius: 15px; padding: 2rem; margin-bottom: 3rem;'>
+        <div style='display: flex; align-items: center; margin-bottom: 1.5rem;'>
+            <div style='background: #c53030; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 1rem;'>!</div>
+            <h2 style='color: #742a2a; margin: 0; font-size: 1.8rem;'>{get_text('india_emergency')}</h2>
+        </div>
+        <div style='font-size: 1.3rem; line-height: 2.5;'>
+            <p style='margin: 0.5rem 0;'><strong style='color: #c53030;'>{get_text('ambulance')}</strong> <span style='font-size: 1.5rem; font-weight: bold;'>102 / 108</span></p>
+            <p style='margin: 0.5rem 0;'><strong style='color: #c53030;'>{get_text('police')}</strong> <span style='font-size: 1.5rem; font-weight: bold;'>100</span></p>
+            <p style='margin: 0.5rem 0;'><strong style='color: #c53030;'>{get_text('fire')}</strong> <span style='font-size: 1.5rem; font-weight: bold;'>101</span></p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Emergency Conditions - Row 1
+    emerg_col1, emerg_col2 = st.columns(2)
+    
+    with emerg_col1:
+        st.markdown(f"""
+        <div style='background: white; border-radius: 15px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 1.5rem; cursor: pointer; transition: transform 0.3s;'>
+            <div style='display: flex; align-items: center; justify-content: space-between;'>
+                <div style='display: flex; align-items: center;'>
+                    <div style='background: #fff5f5; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;'>
+                        <span style='font-size: 2rem;'>❤️</span>
+                    </div>
+                    <div>
+                        <h3 style='margin: 0; font-size: 1.5rem; color: #2d3748;'>{get_text('heart_attack')}</h3>
+                        <p style='margin: 0.3rem 0 0 0; color: #718096;'>{get_text('tap_first_aid')}</p>
+                    </div>
+                </div>
+                <span style='font-size: 1.5rem; color: #cbd5e0;'>›</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("Show Heart Attack First Aid", key="heart_attack_btn", use_container_width=True):
+            st.info("""
+            **Heart Attack First Aid Steps:**
+            1. Call 102/108 immediately
+            2. Help person sit down and rest
+            3. Loosen tight clothing
+            4. Give aspirin if available (chew, don't swallow)
+            5. Stay calm and monitor breathing
+            6. Be ready to perform CPR if needed
+            """)
+    
+    with emerg_col2:
+        st.markdown(f"""
+        <div style='background: white; border-radius: 15px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 1.5rem;'>
+            <div style='display: flex; align-items: center; justify-content: space-between;'>
+                <div style='display: flex; align-items: center;'>
+                    <div style='background: #fff5f5; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;'>
+                        <span style='font-size: 2rem;'>🧠</span>
+                    </div>
+                    <div>
+                        <h3 style='margin: 0; font-size: 1.5rem; color: #2d3748;'>{get_text('stroke_fast')}</h3>
+                        <p style='margin: 0.3rem 0 0 0; color: #718096;'>{get_text('tap_first_aid')}</p>
+                    </div>
+                </div>
+                <span style='font-size: 1.5rem; color: #cbd5e0;'>›</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("Show Stroke First Aid", key="stroke_btn", use_container_width=True):
+            st.info("""
+            **Stroke (FAST Method):**
+            - F: Face - Ask to smile, check if one side droops
+            - A: Arms - Raise both arms, check if one drifts down
+            - S: Speech - Ask to repeat a phrase, check if slurred
+            - T: Time - Call 102/108 immediately if any signs
+            
+            Keep person lying down with head slightly elevated.
+            """)
+    
+    # Emergency Conditions - Row 2
+    emerg_col3, emerg_col4 = st.columns(2)
+    
+    with emerg_col3:
+        st.markdown(f"""
+        <div style='background: white; border-radius: 15px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 1.5rem;'>
+            <div style='display: flex; align-items: center; justify-content: space-between;'>
+                <div style='display: flex; align-items: center;'>
+                    <div style='background: #fff5f5; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;'>
+                        <span style='font-size: 2rem;'>🫁</span>
+                    </div>
+                    <div>
+                        <h3 style='margin: 0; font-size: 1.5rem; color: #2d3748;'>{get_text('breathing_difficulty')}</h3>
+                        <p style='margin: 0.3rem 0 0 0; color: #718096;'>{get_text('tap_first_aid')}</p>
+                    </div>
+                </div>
+                <span style='font-size: 1.5rem; color: #cbd5e0;'>›</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("Show Breathing First Aid", key="breathing_btn", use_container_width=True):
+            st.info("""
+            **Severe Breathing Difficulty:**
+            1. Call 102/108 immediately
+            2. Help person sit upright
+            3. Loosen tight clothing around neck/chest
+            4. Keep calm, encourage slow breathing
+            5. If they have inhaler, help them use it
+            6. Monitor consciousness
+            """)
+    
+    with emerg_col4:
+        st.markdown(f"""
+        <div style='background: white; border-radius: 15px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 1.5rem;'>
+            <div style='display: flex; align-items: center; justify-content: space-between;'>
+                <div style='display: flex; align-items: center;'>
+                    <div style='background: #fff5f5; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;'>
+                        <span style='font-size: 2rem;'>💉</span>
+                    </div>
+                    <div>
+                        <h3 style='margin: 0; font-size: 1.5rem; color: #2d3748;'>{get_text('diabetic_emergency')}</h3>
+                        <p style='margin: 0.3rem 0 0 0; color: #718096;'>{get_text('tap_first_aid')}</p>
+                    </div>
+                </div>
+                <span style='font-size: 1.5rem; color: #cbd5e0;'>›</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("Show Diabetic Emergency First Aid", key="diabetic_btn", use_container_width=True):
+            st.info("""
+            **Diabetic Emergency (Low Sugar):**
+            1. If conscious: Give sugary drink/candy immediately
+            2. Wait 15 minutes, recheck
+            3. If unconscious: Call 102/108, do NOT give food/drink
+            4. Place in recovery position
+            5. Monitor breathing
+            6. Stay with them until help arrives
+            """)
+    
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    # Back button
+    if st.button(get_text('back_home'), use_container_width=True):
+        st.session_state.page = 'home'
+        st.rerun()
+
+# ========================================
+# MAIN APP LOGIC
+# ========================================
+def main():
+    """Main application logic"""
+    
+    # Route to appropriate page based on session state
+    if st.session_state.page == 'home':
+        home_page()
+    elif st.session_state.page == 'login':
+        login_page()
+    elif st.session_state.page == 'chatbot':
+        show_app_redirect()
+    elif st.session_state.page == 'assessments':
+        show_app_redirect()
+    elif st.session_state.page == 'redirect':
+        show_app_redirect()
+    elif st.session_state.page == 'emergency':
+        emergency_page()
+
+# Run the app
+if __name__ == "__main__":
+    main()
