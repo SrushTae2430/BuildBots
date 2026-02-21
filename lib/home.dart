@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'chatbot.dart';
 import 'vitals.dart';
 import 'emergency.dart';
+import 'analysis.dart';
 import 'ayu_theme.dart';
 
 class HomePage extends StatelessWidget {
@@ -167,6 +168,21 @@ class HomePage extends StatelessWidget {
           
           const SizedBox(height: 10),
           
+          ElevatedButton.icon(
+            icon: const Icon(Icons.analytics_outlined),
+            label: const Text("View Health Analysis Trends"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6c5ce7),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AnalysisPage()),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
           ElevatedButton.icon(
             icon: const Icon(Icons.chat_bubble_outline),
             label: const Text("Start AI Health Assistant"),
