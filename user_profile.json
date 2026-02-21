@@ -1,0 +1,17 @@
+{
+    "email": "test@example.com",
+    "age": 30,
+    "language": "English",
+    "gender": "Male",
+    "height": null,
+    "weight": null,
+    "lifestyle": null,
+    "smoking": null,
+    "alcohol": null,
+    "exercise": null,
+    "diet": null,
+    "sleep": null,
+    "stress": null,
+    "conditions": null,
+    "family_history": []
+}

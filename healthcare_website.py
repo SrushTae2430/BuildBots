@@ -1,11 +1,13 @@
 import streamlit as st
 import streamlit.components.v1 as components
+import requests
+import json
 
 # ========================================
 # PAGE CONFIGURATION
 # ========================================
 st.set_page_config(
-    page_title="HealthCare AI - Early Disease Detection",
+    page_title="AyuCare - Early Disease Detection",
     page_icon="🏥",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -417,7 +419,7 @@ if 'language' not in st.session_state:
 # ========================================
 TRANSLATIONS = {
     'English': {
-        'site_title': 'HealthCare AI',
+        'site_title': 'AyuCare',
         'site_subtitle': 'Early Detection • AI Insights • Privacy First',
         'trusted_platform': 'Trusted Healthcare Platform',
         'hero_title': 'Your Health, Our Priority',
@@ -456,12 +458,12 @@ TRANSLATIONS = {
         'personalized_desc': 'Uses your health profile, lifestyle habits, and medical history to provide tailored recommendations and health risk assessments',
         'multi_language': 'Multi-language Support',
         'multi_language_desc': 'Communicate in your preferred language: English, Hindi (हिन्दी), Marathi (मराठी), Tamil (தமிழ்), Telugu (తెలుగు), and Bengali (বাংলা)',
-        'footer_about': 'About HealthCare AI',
+        'footer_about': 'About AyuCare',
         'footer_about_text': 'AI-powered healthcare platform designed for early disease detection and personalized health insights for Indian users. Our mission is to make quality healthcare accessible to everyone through technology.',
         'footer_languages': 'Languages Supported',
         'footer_disclaimer': 'Important Disclaimer',
         'footer_disclaimer_text': 'This is a prototype for educational purposes. The information provided is not a substitute for professional medical advice. Always consult qualified healthcare professionals for medical diagnosis and treatment.',
-        'footer_copyright': '© 2026 HealthCare AI. Privacy-first healthcare technology.\nYour health data is encrypted and never shared with third parties.',
+        'footer_copyright': '© 2026 AyuCare. Privacy-first healthcare technology.\nYour health data is encrypted and never shared with third parties.',
         'download_app': '📱 Download Our Mobile App',
         'download_text': 'For the best experience and to access all features including:\nAI Chatbot, Health Assessments, and Personalized Insights\n\nPlease download our mobile application from the Google Play Store.',
         'download_button': '📥 Download from Google Play Store',
@@ -514,7 +516,7 @@ TRANSLATIONS = {
         'tap_first_aid': 'Tap for first aid steps',
     },
     'हिन्दी': {
-        'site_title': 'हेल्थकेयर एआई',
+        'site_title': 'AyuCare',
         'site_subtitle': 'शीघ्र पहचान • एआई अंतर्दृष्टि • गोपनीयता प्रथम',
         'trusted_platform': 'विश्वसनीय स्वास्थ्य सेवा मंच',
         'hero_title': 'आपका स्वास्थ्य, हमारी प्राथमिकता',
@@ -553,12 +555,12 @@ TRANSLATIONS = {
         'personalized_desc': 'अनुकूलित सिफारिशें और स्वास्थ्य जोखिम मूल्यांकन प्रदान करने के लिए आपकी स्वास्थ्य प्रोफ़ाइल, जीवन शैली की आदतों और चिकित्सा इतिहास का उपयोग करता है',
         'multi_language': 'बहु-भाषा समर्थन',
         'multi_language_desc': 'अपनी पसंदीदा भाषा में संवाद करें: अंग्रेजी, हिन्दी, मराठी, तमिल, तेलुगु और बंगाली',
-        'footer_about': 'हेल्थकेयर एआई के बारे में',
+        'footer_about': 'AyuCare के बारे में',
         'footer_about_text': 'भारतीय उपयोगकर्ताओं के लिए शीघ्र रोग पहचान और व्यक्तिगत स्वास्थ्य अंतर्दृष्टि के लिए डिज़ाइन किया गया एआई-संचालित स्वास्थ्य सेवा मंच। हमारा मिशन प्रौद्योगिकी के माध्यम से सभी के लिए गुणवत्तापूर्ण स्वास्थ्य सेवा को सुलभ बनाना है।',
         'footer_languages': 'समर्थित भाषाएं',
         'footer_disclaimer': 'महत्वपूर्ण अस्वीकरण',
         'footer_disclaimer_text': 'यह शैक्षिक उद्देश्यों के लिए एक प्रोटोटाइप है। प्रदान की गई जानकारी पेशेवर चिकित्सा सलाह का विकल्प नहीं है। चिकित्सा निदान और उपचार के लिए हमेशा योग्य स्वास्थ्य सेवा पेशेवरों से परामर्श लें।',
-        'footer_copyright': '© 2026 हेल्थकेयर एआई। गोपनीयता-प्रथम स्वास्थ्य सेवा प्रौद्योगिकी।\nआपका स्वास्थ्य डेटा एन्क्रिप्टेड है और कभी तीसरे पक्ष के साथ साझा नहीं किया जाता।',
+        'footer_copyright': '© 2026 AyuCare। गोपनीयता-प्रथम स्वास्थ्य सेवा प्रौद्योगिकी।\nआपका स्वास्थ्य डेटा एन्क्रिप्टेड है और कभी तीसरे पक्ष के साथ साझा नहीं किया जाता।',
         'download_app': '📱 हमारा मोबाइल ऐप डाउनलोड करें',
         'download_text': 'सर्वोत्तम अनुभव और सभी सुविधाओं तक पहुंच के लिए:\nएआई चैटबॉट, स्वास्थ्य मूल्यांकन और व्यक्तिगत अंतर्दृष्टि\n\nकृपया Google Play Store से हमारा मोबाइल एप्लिकेशन डाउनलोड करें।',
         'download_button': '📥 Google Play Store से डाउनलोड करें',
@@ -650,12 +652,12 @@ TRANSLATIONS = {
         'personalized_desc': 'अनुकूलित शिफारसी आणि आरोग्य जोखीम मूल्यांकन प्रदान करण्यासाठी तुमची आरोग्य प्रोफाइल, जीवनशैली सवयी आणि वैद्यकीय इतिहास वापरते',
         'multi_language': 'बहु-भाषा समर्थन',
         'multi_language_desc': 'तुमच्या पसंतीच्या भाषेत संवाद साधा: इंग्रजी, हिंदी, मराठी, तमिळ, तेलुगु आणि बंगाली',
-        'footer_about': 'हेल्थकेअर एआय बद्दल',
+        'footer_about': 'AyuCare बद्दल',
         'footer_about_text': 'भारतीय वापरकर्त्यांसाठी लवकर रोग शोध आणि वैयक्तिक आरोग्य अंतर्दृष्टीसाठी डिझाइन केलेले एआय-चालित आरोग्य सेवा व्यासपीठ। आमचे ध्येय तंत्रज्ञानाद्वारे सर्वांसाठी दर्जेदार आरोग्य सेवा सुलभ करणे आहे।',
         'footer_languages': 'समर्थित भाषा',
         'footer_disclaimer': 'महत्त्वाचा अस्वीकरण',
         'footer_disclaimer_text': 'हे शैक्षणिक हेतूंसाठी एक प्रोटोटाइप आहे. प्रदान केलेली माहिती व्यावसायिक वैद्यकीय सल्ल्याचा पर्याय नाही. वैद्यकीय निदान आणि उपचारांसाठी नेहमी पात्र आरोग्य सेवा व्यावसायिकांशी सल्लामसलत करा।',
-        'footer_copyright': '© 2026 हेल्थकेअर एआय. गोपनीयता-प्रथम आरोग्य सेवा तंत्रज्ञान।\nतुमचा आरोग्य डेटा एन्क्रिप्टेड आहे आणि कधीही तृतीय पक्षांसह शेअर केला जात नाही।',
+        'footer_copyright': '© 2026 AyuCare. गोपनीयता-प्रथम आरोग्य सेवा तंत्रज्ञान।\nतुमचा आरोग्य डेटा एन्क्रिप्टेड आहे आणि कधीही तृतीय पक्षांसह शेअर केला जात नाही।',
         'download_app': '📱 आमचे मोबाइल अॅप डाउनलोड करा',
         'download_text': 'सर्वोत्तम अनुभव आणि सर्व वैशिष्ट्यांमध्ये प्रवेश करण्यासाठी:\nएआय चॅटबॉट, आरोग्य मूल्यांकन आणि वैयक्तिक अंतर्दृष्टी\n\nकृपया Google Play Store वरून आमचे मोबाइल अॅप्लिकेशन डाउनलोड करा।',
         'download_button': '📥 Google Play Store वरून डाउनलोड करा',
@@ -708,7 +710,7 @@ TRANSLATIONS = {
         'tap_first_aid': 'प्राथमिक वैद्यकीय पायऱ्यांसाठी टॅप करा',
     },
     'தமிழ்': {
-        'site_title': 'ஹெல்த்கேர் ஏஐ',
+        'site_title': 'AyuCare',
         'site_subtitle': 'முன்கூட்டியே கண்டறிதல் • ஏஐ நுண்ணறிவு • தனியுரிமை முதலில்',
         'trusted_platform': 'நம்பகமான சுகாதார தளம்',
         'hero_title': 'உங்கள் ஆரோக்கியம், எங்கள் முன்னுரிமை',
@@ -747,12 +749,12 @@ TRANSLATIONS = {
         'personalized_desc': 'தனிப்பயனாக்கப்பட்ட பரிந்துரைகள் மற்றும் ஆரோக்கிய அபாய மதிப்பீடுகளை வழங்க உங்கள் ஆரோக்கிய சுயவிவரம், வாழ்க்கை முறை பழக்கவழக்கங்கள் மற்றும் மருத்துவ வரலாற்றைப் பயன்படுத்துகிறது',
         'multi_language': 'பல-மொழி ஆதரவு',
         'multi_language_desc': 'உங்கள் விருப்பமான மொழியில் தொடர்பு கொள்ளுங்கள்: ஆங்கிலம், இந்தி, மராத்தி, தமிழ், தெலுங்கு மற்றும் வங்காளம்',
-        'footer_about': 'ஹெல்த்கேர் ஏஐ பற்றி',
+        'footer_about': 'AyuCare பற்றி',
         'footer_about_text': 'இந்திய பயனர்களுக்கான ஆரம்ப நோய் கண்டறிதல் மற்றும் தனிப்பயனாக்கப்பட்ட ஆரோக்கிய நுண்ணறிவுக்காக வடிவமைக்கப்பட்ட ஏஐ-இயங்கும் சுகாதார தளம். தொழில்நுட்பத்தின் மூலம் அனைவருக்கும் தரமான சுகாதாரத்தை அணுகக்கூடியதாக்குவதே எங்கள் நோக்கம்।',
         'footer_languages': 'ஆதரிக்கப்படும் மொழிகள்',
         'footer_disclaimer': 'முக்கிய மறுப்பு',
         'footer_disclaimer_text': 'இது கல்வி நோக்கங்களுக்கான ஒரு முன்மாதிரி. வழங்கப்பட்ட தகவல் தொழில்முறை மருத்துவ ஆலோசனைக்கு மாற்றாக இல்லை. மருத்துவ நோயறிதல் மற்றும் சிகிச்சைக்கு எப்போதும் தகுதிவாய்ந்த சுகாதார நிபுணர்களை அணுகவும்।',
-        'footer_copyright': '© 2026 ஹெல்த்கேர் ஏஐ. தனியுரிமை-முதல் சுகாதார தொழில்நுட்பம்।\nஉங்கள் ஆரோக்கிய தரவு குறியாக்கம் செய்யப்பட்டுள்ளது மற்றும் மூன்றாம் தரப்பினருடன் ஒருபோதும் பகிரப்படவில்லை।',
+        'footer_copyright': '© 2026 AyuCare. தனியுரிமை-முதல் சுகாதார தொழில்நுட்பம்।\nஉங்கள் ஆரோக்கிய தரவு குறியாக்கம் செய்யப்பட்டுள்ளது மற்றும் மூன்றாம் தரப்பினருடன் ஒருபோதும் பகிரப்படவில்லை।',
         'download_app': '📱 எங்கள் மொபைல் ஆப்ஸைப் பதிவிறக்கவும்',
         'download_text': 'சிறந்த அனுபவம் மற்றும் அனைத்து அம்சங்களை அணுக:\nஏஐ சாட்பாட், சுகாதார மதிப்பீடுகள் மற்றும் தனிப்பயனாக்கப்பட்ட நுண்ணறிவு\n\nதயவுசெய்து Google Play Store இலிருந்து எங்கள் மொபைல் பயன்பாட்டைப் பதிவிறக்கவும்।',
         'download_button': '📥 Google Play Store இலிருந்து பதிவிறக்கவும்',
@@ -805,7 +807,7 @@ TRANSLATIONS = {
         'tap_first_aid': 'முதலுதவி படிகளுக்கு தட்டவும்',
     },
     'తెలుగు': {
-        'site_title': 'హెల్త్‌కేర్ ఏఐ',
+        'site_title': 'AyuCare',
         'site_subtitle': 'ముందస్తు గుర్తింపు • ఏఐ అంతర్దృష్టులు • గోప్యత మొదట',
         'trusted_platform': 'నమ్మదగిన ఆరోగ్య సంరక్షణ వేదిక',
         'hero_title': 'మీ ఆరోగ్యం, మా ప్రాధాన్యత',
@@ -844,12 +846,12 @@ TRANSLATIONS = {
         'personalized_desc': 'అనుకూలీకరించిన సిఫార్సులు మరియు ఆరోగ్య ప్రమాద అంచనాలను అందించడానికి మీ ఆరోగ్య ప్రొఫైల్, జీవనశైలి అలవాట్లు మరియు వైద్య చరిత్రను ఉపయోగిస్తుంది',
         'multi_language': 'బహుళ-భాషా మద్దతు',
         'multi_language_desc': 'మీ ఇష్ట భాషలో కమ్యూనికేట్ చేయండి: ఇంగ్లీష్, హిందీ, మరాఠీ, తమిళం, తెలుగు మరియు బెంగాలీ',
-        'footer_about': 'హెల్త్‌కేర్ ఏఐ గురించి',
+        'footer_about': 'AyuCare గురించి',
         'footer_about_text': 'భారతీయ వినియోగదారుల కోసం ముందస్తు వ్యాధి గుర్తింపు మరియు వ్యక్తిగతీకరించిన ఆరోగ్య అంతర్దృష్టుల కోసం రూపొందించబడిన ఏఐ-శక్తితో కూడిన ఆరోగ్య సంరక్షణ వేదిక। మా లక్ష్యం సాంకేతికత ద్వారా అందరికీ నాణ్యమైన ఆరోగ్య సంరక్షణను అందుబాటులో ఉంచడం।',
         'footer_languages': 'మద్దతు ఉన్న భాషలు',
         'footer_disclaimer': 'ముఖ్యమైన నిరాకరణ',
         'footer_disclaimer_text': 'ఇది విద్యాపరమైన ప్రయోజనాల కోసం ఒక నమూనా। అందించిన సమాచారం వృత్తిపరమైన వైద్య సలహాకు ప్రత్యామ్నాయం కాదు। వైద్య రోగనిర్ధారణ మరియు చికిత్స కోసం ఎల్లప్పుడూ అర్హత కలిగిన ఆరోగ్య సంరక్షణ నిపుణులను సంప్రదించండి।',
-        'footer_copyright': '© 2026 హెల్త్‌కేర్ ఏఐ। గోప్యత-మొదటి ఆరోగ్య సంరక్షణ సాంకేతికత।\nమీ ఆరోగ్య డేటా ఎన్‌క్రిప్ట్ చేయబడింది మరియు ఎప్పుడూ మూడవ పక్షాలతో భాగస్వామ్యం చేయబడదు।',
+        'footer_copyright': '© 2026 AyuCare। గోప్యత-మొదటి ఆరోగ్య సంరక్షణ సాంకేతికత।\nమీ ఆరోగ్య డేటా ఎన్‌క్రిప్ట్ చేయబడింది మరియు ఎప్పుడూ మూడవ పక్షాలతో భాగస్వామ్యం చేయబడదు।',
         'download_app': '📱 మా మొబైల్ యాప్‌ను డౌన్‌లోడ్ చేయండి',
         'download_text': 'ఉత్తమ అనుభవం మరియు అన్ని లక్షణాలకు ప్రాప్యత కోసం:\nఏఐ చాట్‌బాట్, ఆరోగ్య అంచనాలు మరియు వ్యక్తిగతీకరించిన అంతర్దృష్టులు\n\nదయచేసి Google Play Store నుండి మా మొబైల్ అప్లికేషన్‌ను డౌన్‌లోడ్ చేయండి।',
         'download_button': '📥 Google Play Store నుండి డౌన్‌లోడ్ చేయండి',
@@ -902,7 +904,7 @@ TRANSLATIONS = {
         'tap_first_aid': 'ప్రథమ చికిత్స దశల కోసం నొక్కండి',
     },
     'বাংলা': {
-        'site_title': 'হেলথকেয়ার এআই',
+        'site_title': 'AyuCare',
         'site_subtitle': 'প্রাথমিক সনাক্তকরণ • এআই অন্তর্দৃষ্টি • গোপনীয়তা প্রথম',
         'trusted_platform': 'বিশ্বস্ত স্বাস্থ্যসেবা প্ল্যাটফর্ম',
         'hero_title': 'আপনার স্বাস্থ্য, আমাদের অগ্রাধিকার',
@@ -941,12 +943,12 @@ TRANSLATIONS = {
         'personalized_desc': 'কাস্টমাইজড সুপারিশ এবং স্বাস্থ্য ঝুঁকি মূল্যায়ন প্রদান করতে আপনার স্বাস্থ্য প্রোফাইল, জীবনযাত্রার অভ্যাস এবং চিকিৎসা ইতিহাস ব্যবহার করে',
         'multi_language': 'বহু-ভাষা সমর্থন',
         'multi_language_desc': 'আপনার পছন্দের ভাষায় যোগাযোগ করুন: ইংরেজি, হিন্দি, মারাঠি, তামিল, তেলুগু এবং বাংলা',
-        'footer_about': 'হেলথকেয়ার এআই সম্পর্কে',
+        'footer_about': 'AyuCare সম্পর্কে',
         'footer_about_text': 'ভারতীয় ব্যবহারকারীদের জন্য প্রাথমিক রোগ সনাক্তকরণ এবং ব্যক্তিগতকৃত স্বাস্থ্য অন্তর্দৃষ্টির জন্য ডিজাইন করা এআই-চালিত স্বাস্থ্যসেবা প্ল্যাটফর্ম। আমাদের লক্ষ্য প্রযুক্তির মাধ্যমে সকলের জন্য মানসম্মত স্বাস্থ্যসেবা অ্যাক্সেসযোগ্য করা।',
         'footer_languages': 'সমর্থিত ভাষা',
         'footer_disclaimer': 'গুরুত্বপূর্ণ দাবিত্যাগ',
         'footer_disclaimer_text': 'এটি শিক্ষামূলক উদ্দেশ্যে একটি প্রোটোটাইপ। প্রদত্ত তথ্য পেশাদার চিকিৎসা পরামর্শের বিকল্প নয়। চিকিৎসা নির্ণয় এবং চিকিৎসার জন্য সর্বদা যোগ্য স্বাস্থ্যসেবা পেশাদারদের সাথে পরামর্শ করুন।',
-        'footer_copyright': '© ২০২৬ হেলথকেয়ার এআই। গোপনীয়তা-প্রথম স্বাস্থ্যসেবা প্রযুক্তি।\nআপনার স্বাস্থ্য ডেটা এনক্রিপ্ট করা এবং কখনও তৃতীয় পক্ষের সাথে শেয়ার করা হয় না।',
+        'footer_copyright': '© ২০২৬ AyuCare। গোপনীয়তা-প্রথম স্বাস্থ্যসেবা প্রযুক্তি।\nআপনার স্বাস্থ্য ডেটা এনক্রিপ্ট করা এবং কখনও তৃতীয় পক্ষের সাথে শেয়ার করা হয় না।',
         'download_app': '📱 আমাদের মোবাইল অ্যাপ ডাউনলোড করুন',
         'download_text': 'সেরা অভিজ্ঞতা এবং সমস্ত বৈশিষ্ট্য অ্যাক্সেস করতে:\nএআই চ্যাটবট, স্বাস্থ্য মূল্যায়ন এবং ব্যক্তিগতকৃত অন্তর্দৃষ্টি\n\nঅনুগ্রহ করে Google Play Store থেকে আমাদের মোবাইল অ্যাপ্লিকেশন ডাউনলোড করুন।',
         'download_button': '📥 Google Play Store থেকে ডাউনলোড করুন',
@@ -1617,6 +1619,39 @@ def login_page():
             
             if submitted:
                 if email and age:
+                    # Sync with Backend
+                    profile_data = {
+                        "email": email,
+                        "age": age,
+                        "language": language.split(' ')[0], # Just the name
+                        "gender": gender,
+                        "height": height,
+                        "weight": weight,
+                        "lifestyle": lifestyle if lifestyle != "Select..." else None,
+                        "smoking": smoking if smoking != "Select..." else None,
+                        "alcohol": alcohol if alcohol != "Select..." else None,
+                        "exercise": exercise if exercise != "Select..." else None,
+                        "diet": diet if diet != "Select..." else None,
+                        "sleep": sleep if sleep != "Select..." else None,
+                        "stress": stress if stress != "Select..." else None,
+                        "conditions": medical_conditions,
+                        "family_history": [
+                            "Diabetes" if diabetes_fam else None,
+                            "Cancer" if cancer_fam else None,
+                            "Stroke" if stroke_fam else None,
+                            "Heart Disease" if heart_fam else None,
+                            "Hypertension" if hypertension_fam else None,
+                            "Asthma" if asthma_fam else None,
+                        ]
+                    }
+                    # Filter out None from family_history
+                    profile_data["family_history"] = [f for f in profile_data["family_history"] if f]
+                    
+                    try:
+                        requests.post("http://localhost:8000/login", json=profile_data)
+                    except Exception as e:
+                        st.warning("⚠️ Could not sync with app backend, but logging you in locally.")
+                    
                     st.session_state.page = 'redirect'
                     st.rerun()
                 else:
