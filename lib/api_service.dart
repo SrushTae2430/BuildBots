@@ -3,12 +3,13 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 
 class ApiService {
-  // Use 10.0.2.2 for Android Emulator, localhost for others
-  static const String baseUrl = "http://10.0.2.2:8000";
+  // Use 10.0.2.2 for Android Emulator, localhost/127.0.0.1 for Windows
+  static const String baseUrl = "http://127.0.0.1:8000";
 
-  static Future<Map<String, dynamic>> getProfile() async {
+  static Future<Map<String, dynamic>> getProfile({String? email}) async {
     try {
-      final response = await http.get(Uri.parse("$baseUrl/profile"));
+      final url = email != null ? "$baseUrl/profile?email=$email" : "$baseUrl/profile";
+      final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
@@ -16,6 +17,29 @@ class ApiService {
       }
     } catch (e) {
       return {};
+    }
+  }
+
+  static Future<List<dynamic>> getHistory(String email) async {
+    try {
+      final response = await http.get(Uri.parse("$baseUrl/history?email=$email"));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<bool> addVitals(String email, double risk, String stability) async {
+    try {
+      final response = await http.post(
+        Uri.parse("$baseUrl/add-vitals?email=$email&risk=$risk&stability=$stability"),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
     }
   }
 
