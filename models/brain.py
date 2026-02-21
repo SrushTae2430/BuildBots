@@ -20,9 +20,9 @@ try:
     model = joblib.load("kidney_model.pkl")
     # This list ensures we send data in the EXACT order the model expects
     expected_features = model.feature_names_in_.tolist()
-    print(f"✅ Model Loaded. Expecting {len(expected_features)} features.")
+    print(f" Model Loaded. Expecting {len(expected_features)} features.")
 except Exception as e:
-    print(f"❌ Error loading model: {e}")
+    print(f" Error loading model: {e}")
     expected_features = []
 
 # 2. Define the Schema for 25 Inputs
