@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home.dart';
 import 'api_service.dart';
 import 'ayu_theme.dart';
+import 'db_helper.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,6 +14,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+
+  final DBHelper _dbHelper = DBHelper();
 
   // Form Fields State
   final _emailController = TextEditingController();
@@ -150,6 +153,8 @@ class _LoginPageState extends State<LoginPage> {
       "medical_conditions": _medicalConditionsController.text,
       "family_history": _familyHistory.entries.where((e) => e.value).map((e) => e.key).toList(),
     };
+
+    await _dbHelper.insertUser(profileData); 
 
     final success = await ApiService.login(profileData);
 
