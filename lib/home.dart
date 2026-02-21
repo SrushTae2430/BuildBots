@@ -119,7 +119,7 @@ class HomePage extends StatelessWidget {
                 const SizedBox(height: 5),
                 Text(
                   "Language: ${userProfile['language']} | Age: ${userProfile['age']}",
-                  style: const TextStyle(color: AyuTheme.darkBlue, opacity: 0.8),
+                  style: TextStyle(color: AyuTheme.darkBlue.withOpacity(0.8)),
                 ),
               ],
             ),

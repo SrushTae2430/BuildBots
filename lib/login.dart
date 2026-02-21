@@ -320,6 +320,21 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 12),
                     TextButton(
+                      onPressed: () {
+                        final demoProfile = {
+                          "email": "demo@ayucare.ai",
+                          "language": "English",
+                          "age": 28,
+                        };
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => HomePage(userProfile: demoProfile)),
+                        );
+                      },
+                      child: const Text("Skip Sync (Demo Mode) →", style: TextStyle(color: Colors.grey)),
+                    ),
+                    const SizedBox(height: 12),
+                    TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: Container(
                         width: double.infinity,

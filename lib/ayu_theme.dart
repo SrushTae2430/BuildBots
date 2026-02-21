@@ -32,7 +32,7 @@ class AyuTheme {
         secondary: darkBlue,
       ),
       fontFamily: 'Roboto', // Modern enough
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
