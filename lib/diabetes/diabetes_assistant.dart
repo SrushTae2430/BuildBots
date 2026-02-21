@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/api_service.dart';
+import '../services/ocr_service.dart';
 
 class DiabetesAssistantScreen extends StatefulWidget {
   const DiabetesAssistantScreen({super.key});
@@ -21,12 +23,39 @@ class _DiabetesAssistantScreenState extends State<DiabetesAssistantScreen> {
     'age': 30,
   };
 
+  final Map<String, TextEditingController> _controllers = {};
+
   bool _isLoading = false;
   double? _riskResult;
 
+  @override
+  void initState() {
+    super.initState();
+    // initialize controllers with default values
+    _controllers['glucose'] = TextEditingController(text: _formData['glucose'].toString());
+    _controllers['blood_pressure'] = TextEditingController(text: _formData['blood_pressure'].toString());
+    _controllers['bmi'] = TextEditingController(text: _formData['bmi'].toString());
+    _controllers['age'] = TextEditingController(text: _formData['age'].toString());
+    _controllers['pregnancies'] = TextEditingController(text: _formData['pregnancies'].toString());
+  }
+
+  @override
+  void dispose() {
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
   void _submit() async {
+    // sync controllers into _formData before submit
+    _formData['glucose'] = double.tryParse(_controllers['glucose']?.text ?? '') ?? _formData['glucose'];
+    _formData['blood_pressure'] = double.tryParse(_controllers['blood_pressure']?.text ?? '') ?? _formData['blood_pressure'];
+    _formData['bmi'] = double.tryParse(_controllers['bmi']?.text ?? '') ?? _formData['bmi'];
+    _formData['age'] = int.tryParse(_controllers['age']?.text ?? '') ?? _formData['age'];
+    _formData['pregnancies'] = int.tryParse(_controllers['pregnancies']?.text ?? '') ?? _formData['pregnancies'];
+
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
       setState(() {
         _isLoading = true;
         _riskResult = null;
@@ -62,6 +91,63 @@ class _DiabetesAssistantScreenState extends State<DiabetesAssistantScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.camera_alt),
+                          label: const Text('Scan Report'),
+                          onPressed: () async {
+                            final source = await showDialog<ImageSource>(
+                              context: context,
+                              builder: (ctx) => SimpleDialog(
+                                title: const Text('Choose Image Source'),
+                                children: [
+                                  SimpleDialogOption(
+                                    onPressed: () => Navigator.pop(ctx, ImageSource.camera),
+                                    child: const Text('Camera'),
+                                  ),
+                                  SimpleDialogOption(
+                                    onPressed: () => Navigator.pop(ctx, ImageSource.gallery),
+                                    child: const Text('Gallery'),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (source == null) return;
+
+                            final text = await OcrService.pickAndRecognizeText(source: source);
+                            if (text == null || text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No text detected')));
+                              return;
+                            }
+
+                            final parsed = OcrService.parseFields(text, {
+                              'glucose': ['glucose', 'glucose level', 'glc'],
+                              'blood_pressure': ['blood pressure', 'bp'],
+                              'bmi': ['bmi'],
+                              'age': ['age'],
+                              'pregnancies': ['pregnancy', 'pregnancies'],
+                            });
+
+                            setState(() {
+                              parsed.forEach((k, v) {
+                                if (_formData.containsKey(k)) {
+                                  final isInt = _formData[k] is int;
+                                  final newVal = isInt ? v.toInt() : v;
+                                  _formData[k] = newVal;
+                                  // update controller if present
+                                  if (_controllers.containsKey(k)) _controllers[k]!.text = newVal.toString();
+                                }
+                              });
+                            });
+
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fields populated from report')));
+                          },
+                        ),
+                      ],
+                    ),
                     if (_riskResult != null)
                       Card(
                         color: _riskResult! > 50 ? Colors.orange[100] : Colors.green[100],
@@ -87,38 +173,33 @@ class _DiabetesAssistantScreenState extends State<DiabetesAssistantScreen> {
                       ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _controllers['glucose'],
                       decoration: const InputDecoration(labelText: "Glucose Level", border: OutlineInputBorder()),
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      initialValue: _formData['glucose'].toString(),
-                      onSaved: (val) => _formData['glucose'] = double.parse(val!),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      controller: _controllers['blood_pressure'],
                       decoration: const InputDecoration(labelText: "Blood Pressure", border: OutlineInputBorder()),
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      initialValue: _formData['blood_pressure'].toString(),
-                      onSaved: (val) => _formData['blood_pressure'] = double.parse(val!),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      controller: _controllers['bmi'],
                       decoration: const InputDecoration(labelText: "BMI", border: OutlineInputBorder()),
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      initialValue: _formData['bmi'].toString(),
-                      onSaved: (val) => _formData['bmi'] = double.parse(val!),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      controller: _controllers['age'],
                       decoration: const InputDecoration(labelText: "Age", border: OutlineInputBorder()),
                       keyboardType: TextInputType.number,
-                      initialValue: _formData['age'].toString(),
-                      onSaved: (val) => _formData['age'] = int.parse(val!),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      controller: _controllers['pregnancies'],
                       decoration: const InputDecoration(labelText: "Pregnancies", border: OutlineInputBorder()),
                       keyboardType: TextInputType.number,
-                      initialValue: _formData['pregnancies'].toString(),
-                      onSaved: (val) => _formData['pregnancies'] = int.parse(val!),
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(

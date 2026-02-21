@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../services/api_service.dart';
+import '../services/ocr_service.dart';
 
 class HeartAssistantScreen extends StatefulWidget {
   const HeartAssistantScreen({super.key});
@@ -26,12 +28,36 @@ class _HeartAssistantScreenState extends State<HeartAssistantScreen> {
     'thal': 2,
   };
 
+  final Map<String, TextEditingController> _controllers = {};
+
   bool _isLoading = false;
   double? _riskResult;
 
+  @override
+  void initState() {
+    super.initState();
+    _controllers['age'] = TextEditingController(text: _formData['age'].toString());
+    _controllers['trestbps'] = TextEditingController(text: _formData['trestbps'].toString());
+    _controllers['chol'] = TextEditingController(text: _formData['chol'].toString());
+    _controllers['thalach'] = TextEditingController(text: _formData['thalach'].toString());
+    _controllers['oldpeak'] = TextEditingController(text: _formData['oldpeak'].toString());
+  }
+
+  @override
+  void dispose() {
+    for (final c in _controllers.values) c.dispose();
+    super.dispose();
+  }
+
   void _submit() async {
+    // sync controllers
+    _formData['age'] = int.tryParse(_controllers['age']?.text ?? '') ?? _formData['age'];
+    _formData['trestbps'] = int.tryParse(_controllers['trestbps']?.text ?? '') ?? _formData['trestbps'];
+    _formData['chol'] = int.tryParse(_controllers['chol']?.text ?? '') ?? _formData['chol'];
+    _formData['thalach'] = int.tryParse(_controllers['thalach']?.text ?? '') ?? _formData['thalach'];
+    _formData['oldpeak'] = double.tryParse(_controllers['oldpeak']?.text ?? '') ?? _formData['oldpeak'];
+
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
       setState(() {
         _isLoading = true;
         _riskResult = null;
@@ -67,6 +93,62 @@ class _HeartAssistantScreenState extends State<HeartAssistantScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.camera_alt),
+                          label: const Text('Scan Report'),
+                          onPressed: () async {
+                            final source = await showDialog<ImageSource>(
+                              context: context,
+                              builder: (ctx) => SimpleDialog(
+                                title: const Text('Choose Image Source'),
+                                children: [
+                                  SimpleDialogOption(
+                                    onPressed: () => Navigator.pop(ctx, ImageSource.camera),
+                                    child: const Text('Camera'),
+                                  ),
+                                  SimpleDialogOption(
+                                    onPressed: () => Navigator.pop(ctx, ImageSource.gallery),
+                                    child: const Text('Gallery'),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (source == null) return;
+
+                            final text = await OcrService.pickAndRecognizeText(source: source);
+                            if (text == null || text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No text detected')));
+                              return;
+                            }
+
+                            final parsed = OcrService.parseFields(text, {
+                              'age': ['age'],
+                              'trestbps': ['blood pressure', 'trestbps', 'bp'],
+                              'chol': ['cholesterol', 'chol'],
+                              'thalach': ['thalach', 'max heart rate', 'heart rate'],
+                              'oldpeak': ['oldpeak', 'st depression', 'st-depression'],
+                            });
+
+                            setState(() {
+                              parsed.forEach((k, v) {
+                                if (_formData.containsKey(k)) {
+                                  final isInt = _formData[k] is int;
+                                  final newVal = isInt ? v.toInt() : v;
+                                  _formData[k] = newVal;
+                                  if (_controllers.containsKey(k)) _controllers[k]!.text = newVal.toString();
+                                }
+                              });
+                            });
+
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fields populated from report')));
+                          },
+                        ),
+                      ],
+                    ),
                     if (_riskResult != null)
                       Card(
                         color: _riskResult! > 50 ? Colors.red[100] : Colors.green[100],
@@ -92,10 +174,9 @@ class _HeartAssistantScreenState extends State<HeartAssistantScreen> {
                       ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _controllers['age'],
                       decoration: const InputDecoration(labelText: "Age", border: OutlineInputBorder()),
                       keyboardType: TextInputType.number,
-                      initialValue: _formData['age'].toString(),
-                      onSaved: (val) => _formData['age'] = int.parse(val!),
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<int>(
@@ -109,31 +190,27 @@ class _HeartAssistantScreenState extends State<HeartAssistantScreen> {
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      controller: _controllers['trestbps'],
                       decoration: const InputDecoration(labelText: "Resting Blood Pressure (trestbps)", border: OutlineInputBorder()),
                       keyboardType: TextInputType.number,
-                      initialValue: _formData['trestbps'].toString(),
-                      onSaved: (val) => _formData['trestbps'] = int.parse(val!),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      controller: _controllers['chol'],
                       decoration: const InputDecoration(labelText: "Cholesterol (chol)", border: OutlineInputBorder()),
                       keyboardType: TextInputType.number,
-                      initialValue: _formData['chol'].toString(),
-                      onSaved: (val) => _formData['chol'] = int.parse(val!),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      controller: _controllers['thalach'],
                       decoration: const InputDecoration(labelText: "Max Heart Rate (thalach)", border: OutlineInputBorder()),
                       keyboardType: TextInputType.number,
-                      initialValue: _formData['thalach'].toString(),
-                      onSaved: (val) => _formData['thalach'] = int.parse(val!),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
+                      controller: _controllers['oldpeak'],
                       decoration: const InputDecoration(labelText: "ST Depression (oldpeak)", border: OutlineInputBorder()),
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      initialValue: _formData['oldpeak'].toString(),
-                      onSaved: (val) => _formData['oldpeak'] = double.parse(val!),
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(

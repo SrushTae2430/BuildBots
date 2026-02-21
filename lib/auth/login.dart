@@ -111,19 +111,22 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
         const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: value,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.grey[100],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DropdownButtonFormField<String>(
+            value: value,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.grey[100],
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
+            onChanged: onChanged,
           ),
-          items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
-          onChanged: onChanged,
         ),
         const SizedBox(height: 16),
       ],
@@ -131,6 +134,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _handleLogin() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     final profileData = {
@@ -153,14 +157,15 @@ class _LoginPageState extends State<LoginPage> {
 
     final success = await ApiService.login(profileData);
 
+    if (!mounted) return;
     setState(() => _isLoading = false);
 
-    if (success && mounted) {
+    if (success) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => HomePage(userProfile: profileData)),
       );
-    } else if (mounted) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Sync failed. Check connection.")),
       );

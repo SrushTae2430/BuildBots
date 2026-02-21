@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'package:image_picker/image_picker.dart';
+import '../services/ocr_service.dart';
 
 class KidneyAssistantScreen extends StatefulWidget {
   const KidneyAssistantScreen({super.key});
@@ -44,9 +46,21 @@ class _KidneyAssistantScreenState extends State<KidneyAssistantScreen> {
   double? _riskResult;
   String? _status;
 
+  final Map<String, TextEditingController> _controllers = {};
+
+  // Add the new button and OCR functionality
   void _submit() async {
+    // sync controllers into formData
+    for (final key in _controllers.keys) {
+      final txt = _controllers[key]?.text ?? '';
+      if (txt.isEmpty) continue;
+      if (_formData.containsKey(key)) {
+        final isInt = _formData[key] is int;
+        _formData[key] = isInt ? int.tryParse(txt) ?? _formData[key] : double.tryParse(txt) ?? _formData[key];
+      }
+    }
+
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
       setState(() {
         _isLoading = true;
         _riskResult = null;
@@ -80,12 +94,7 @@ class _KidneyAssistantScreenState extends State<KidneyAssistantScreen> {
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         ),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        initialValue: _formData[key].toString(),
-        onSaved: (val) {
-          if (val != null && val.isNotEmpty) {
-            _formData[key] = isFloat ? double.parse(val) : int.parse(val);
-          }
-        },
+        controller: _controllers.putIfAbsent(key, () => TextEditingController(text: _formData[key].toString())),
       ),
     );
   }
@@ -109,6 +118,14 @@ class _KidneyAssistantScreenState extends State<KidneyAssistantScreen> {
         onChanged: (val) => setState(() => _formData[key] = val),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    for (final c in _controllers.values) {
+      c.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -143,11 +160,79 @@ class _KidneyAssistantScreenState extends State<KidneyAssistantScreen> {
                                       fontWeight: FontWeight.bold,
                                     ),
                               ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  // Scan button moved below so it's always visible.
+                                ],
+                              ),
                             ],
                           ),
                         ),
                       ),
                     const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.camera_alt),
+                          label: const Text('Scan Report'),
+                          onPressed: () async {
+                            final source = await showDialog<ImageSource>(
+                              context: context,
+                              builder: (ctx) => SimpleDialog(
+                                title: const Text('Choose Image Source'),
+                                children: [
+                                  SimpleDialogOption(
+                                    onPressed: () => Navigator.pop(ctx, ImageSource.camera),
+                                    child: const Text('Camera'),
+                                  ),
+                                  SimpleDialogOption(
+                                    onPressed: () => Navigator.pop(ctx, ImageSource.gallery),
+                                    child: const Text('Gallery'),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (source == null) return;
+
+                            final text = await OcrService.pickAndRecognizeHighEnd(source: source);
+                            if (text == null || text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No text detected')));
+                              return;
+                            }
+
+                            final parsed = OcrService.parseFields(text, {
+                              'age': ['age'],
+                              'blood_pressure': ['blood pressure', 'bp'],
+                              'serum_creatinine': ['creatinine', 'serum creatinine'],
+                              'hemoglobin': ['hemoglobin', 'hb'],
+                              'blood_glucose_random': ['blood glucose', 'glucose', 'blood glucose random'],
+                              'albumin': ['albumin'],
+                            });
+
+                            setState(() {
+                              parsed.forEach((k, v) {
+                                if (_formData.containsKey(k)) {
+                                  final isInt = _formData[k] is int;
+                                  final newVal = isInt ? v.toInt() : v;
+                                  _formData[k] = newVal;
+                                  if (_controllers.containsKey(k)) {
+                                    _controllers[k]!.text = newVal.toString();
+                                  } else {
+                                    _controllers[k] = TextEditingController(text: newVal.toString());
+                                  }
+                                }
+                              });
+                            });
+
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fields populated from report')));
+                          },
+                        ),
+                      ],
+                    ),
                     const Text("Basic Information", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     const SizedBox(height: 8),
                     Row(
