@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'api_service.dart';
 import 'ayu_theme.dart';
-import 'doctors.dart';
 
 class AnalysisPage extends StatefulWidget {
   final Map<String, dynamic> userProfile;
@@ -302,24 +301,6 @@ class _AnalysisPageState extends State<AnalysisPage> {
                           textAlign: TextAlign.center,
                           style: const TextStyle(color: Colors.white70, fontSize: 14),
                         ),
-                        if (_history.isNotEmpty && (_history.first['risk'] ?? 0) > 7) ...[
-                          const SizedBox(height: 20),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const DoctorsPage(specialty: "Cardiologist")),
-                              );
-                            },
-                            icon: const Icon(Icons.emergency),
-                            label: const Text("Consult Nearby Expert Now"),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.red,
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            ),
-                          ),
-                        ],
                       ],
                     ),
                   ),

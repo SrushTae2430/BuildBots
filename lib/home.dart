@@ -3,7 +3,6 @@ import 'chatbot.dart';
 import 'vitals.dart';
 import 'emergency.dart';
 import 'analysis.dart';
-import 'doctors.dart';
 import 'ayu_theme.dart';
 
 class HomePage extends StatelessWidget {
@@ -180,21 +179,6 @@ class HomePage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => AnalysisPage(userProfile: userProfile)),
-              );
-            },
-          ),
-          const SizedBox(height: 12),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.person_search_outlined),
-            label: const Text("Explore Nearby Doctors"),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF0fb9b1),
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const DoctorsPage()),
               );
             },
           ),
