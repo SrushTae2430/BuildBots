@@ -5,7 +5,8 @@ import 'api_service.dart';
 import 'ayu_theme.dart';
 
 class ChatbotScreen extends StatefulWidget {
-  const ChatbotScreen({super.key});
+  final String initialTopic;
+  const ChatbotScreen({super.key, this.initialTopic = "Skin Diseases"});
 
   @override
   State<ChatbotScreen> createState() => _ChatbotScreenState();
@@ -57,9 +58,11 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isSkin = widget.initialTopic == "Skin Diseases";
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Skin Health Assistant"),
+        title: Text("${widget.initialTopic} Assistant"),
         backgroundColor: AyuTheme.primaryTeal,
         foregroundColor: Colors.white,
         centerTitle: true,
@@ -70,27 +73,52 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           child: Column(
             children: [
               const SizedBox(height: 20),
-
-              const Text(
-                "Upload a clear image of the affected skin area.",
+              
+              Text(
+                isSkin 
+                  ? "Upload a clear image of the affected skin area for AI analysis."
+                  : "Welcome to the ${widget.initialTopic} LLM Assistant. Describe your symptoms or query below.",
                 textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14, color: AyuTheme.textGray),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
 
-              ElevatedButton.icon(
-                onPressed: pickImage,
-                icon: const Icon(Icons.photo_library),
-                label: const Text("Select Skin Image"),
-              ),
-
-              const SizedBox(height: 20),
-
-              if (selectedImage != null)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.file(selectedImage!, height: 200),
+              if (isSkin) ...[
+                ElevatedButton.icon(
+                  onPressed: pickImage,
+                  icon: const Icon(Icons.photo_library),
+                  label: const Text("Select Skin Image"),
                 ),
+                const SizedBox(height: 20),
+                if (selectedImage != null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.file(selectedImage!, height: 200),
+                  ),
+              ] else ...[
+                TextField(
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: "Enter details here...",
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Connecting to ${widget.initialTopic} LLM...")),
+                    );
+                  },
+                  child: const Text("Run AI Assessment"),
+                ),
+              ],
 
               const SizedBox(height: 20),
 
@@ -99,7 +127,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                   children: [
                     CircularProgressIndicator(),
                     SizedBox(height: 10),
-                    Text("Analyzing image...")
+                    Text("Analyzing...")
                   ],
                 ),
 
@@ -113,29 +141,21 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Possible Condition:",
+                        const Text("Diagnostic Insight:",
                             style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text(result!["disease"] ?? "Unknown"),
+                        Text(result!["disease"] ?? "Analysis complete"),
 
                         const SizedBox(height: 8),
 
                         const Text("Risk Level:",
                             style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text(result!["risk_level"] ?? "-"),
-
-                        const SizedBox(height: 8),
-
-                        const Text("Confidence:",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text(
-                          "${((result!["confidence"] ?? 0) * 100).toStringAsFixed(1)}%",
-                        ),
+                        Text(result!["risk_level"] ?? "Low"),
 
                         const SizedBox(height: 12),
 
                         const Text("Advice:",
                             style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text(result!["advice"] ?? "-"),
+                        Text(result!["advice"] ?? "Please consult a professional."),
                       ],
                     ),
                   ),

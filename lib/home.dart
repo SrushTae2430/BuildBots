@@ -8,62 +8,73 @@ class HomePage extends StatelessWidget {
   final Map<String, dynamic> userProfile;
   const HomePage({super.key, required this.userProfile});
 
-  Widget diseaseCard(String title, String subtitle, IconData icon, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+  Widget diseaseCard(BuildContext context, String title, String subtitle, IconData icon, Color color) {
+    return InkWell(
+      onTap: () {
+        // Placeholder for LLM connection
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChatbotScreen(initialTopic: title),
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(icon, color: Colors.white, size: 28),
+                  const SizedBox(width: 10),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                Icon(icon, color: Colors.white, size: 28),
-                const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      subtitle,
+                      style: const TextStyle(color: AyuTheme.textGray),
+                    ),
                   ),
-                ),
-              ],
+                  Icon(Icons.arrow_forward_ios, size: 16, color: color),
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    subtitle,
-                    style: const TextStyle(color: AyuTheme.textGray),
-                  ),
-                ),
-                Icon(Icons.arrow_forward_ios, size: 16, color: color),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -126,27 +137,31 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 15),
 
           diseaseCard(
+            context,
             "Diabetes", 
-            "Common symptoms: Polyuria, Polydipsia, Weight loss", 
+            "Analyze blood sugar trends and risk factors using AI.", 
             Icons.bloodtype, 
             const Color(0xFFff6b6b)
           ),
           diseaseCard(
+            context,
             "Skin Diseases", 
-            "Common symptoms: Rashes, Mole changes, Itching", 
+            "Upload images for instant AI skin lesion analysis.", 
             Icons.healing, 
             const Color(0xFF4facfe)
           ),
           diseaseCard(
+            context,
             "Heart Health", 
-            "Warning signs: Chest pain, SOB, Palpitations", 
+            "Evaluate cardiovascular risks and vital patterns.", 
             Icons.favorite, 
             const Color(0xFFfa709a)
           ),
           diseaseCard(
-            "Respiratory", 
-            "Symptoms: Chronic cough, SOB, Wheezing", 
-            Icons.air, 
+            context,
+            "Kidney Health", 
+            "Assess renal function and health indicators.", 
+            Icons.water_drop, 
             const Color(0xFF30cfd0)
           ),
           
