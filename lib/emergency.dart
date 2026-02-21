@@ -9,6 +9,8 @@ class EmergencyPage extends StatefulWidget {
 }
 
 class _EmergencyPageState extends State<EmergencyPage> {
+  String _selectedLanguage = "English";
+
   final Map<String, Map<String, List<String>>> _firstAidData = {
     "English": {
       "Heart Attack": [
