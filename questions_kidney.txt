@@ -1,0 +1,11 @@
+#,Question in Flutter (UI),Mapping Logic (In brain.py),Clinical Feature(s) Targeted
+1,What is your age?,Direct mapping.,age
+2,Do you have a history of Diabetes?,"If YES, sets sugar high.","diabetes_mellitus, sugar"
+3,Do you have High Blood Pressure?,"If YES, sets BP to 140/90.","hypertension, blood_pressure"
+4,Any history of Heart Disease?,Direct mapping.,coronary_artery_disease
+5,Is your urine foamy or bubbly?,CRITICAL: High protein sign.,"albumin, specific_gravity"
+6,Any pain or burning while urinating?,Maps to infection markers.,"pus_cell, bacteria"
+7,Are your ankles or feet swollen?,Maps to fluid retention.,"pedal_edema, sodium"
+8,Have you lost your appetite recently?,Direct mapping (1=Poor).,appetite
+9,Do you feel unusually tired or weak?,Maps to oxygen/blood levels.,"anaemia, hemoglobin"
+10,Does your skin or eyes look pale?,Maps to blood cell counts.,"red_blood_cell_count, pcv"
