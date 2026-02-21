@@ -1,0 +1,22 @@
+name: buildbots
+description: Medical early detection app
+publish_to: 'none'
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.0.5
+  image_picker: ^1.0.7
+  intl: ^0.20.2
+  http: ^1.2.0
+  flutter_localizations:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
