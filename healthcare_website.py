@@ -2,6 +2,74 @@ import streamlit as st
 import streamlit.components.v1 as components
 import requests
 import json
+import pandas as pd
+import streamlit as st
+import sqlite3
+import pandas as pd
+
+# Connect to local SQLite database (or create it if it doesn't exist)
+import sqlite3
+
+conn = sqlite3.connect("app.db")
+cursor = conn.cursor()
+# Create a users table if it doesn't exist
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    age INTEGER NOT NULL,
+    language TEXT,
+    gender TEXT,
+    height REAL,
+    weight REAL,
+    lifestyle TEXT,
+    smoking TEXT,
+    alcohol TEXT,
+    exercise TEXT,
+    diet TEXT,
+    sleep TEXT,
+    stress TEXT,
+    conditions TEXT,
+    family_history TEXT
+)
+""")
+conn.commit()
+
+# Health Data Table
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS health_data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    sleep_hours INTEGER,
+    food_type TEXT,
+    symptoms TEXT,
+    prediction TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+)
+""")
+
+conn.commit()
+
+# ---------- FUNCTIONS ----------
+
+def add_user(name, email, password):
+    try:
+        cursor.execute("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", 
+                       (name, email, password))
+        conn.commit()  # Yeh sabse important hai, iske bina save nahi hoga
+        return True
+    except Exception as e:
+        st.error(f"Error: {e}")
+        return False
+
+def add_health_data(user_id, sleep_hours, food_type, symptoms, prediction):
+    cursor.execute("""
+        INSERT INTO health_data
+        (user_id, sleep_hours, food_type, symptoms, prediction)
+        VALUES (?, ?, ?, ?, ?)
+    """, (user_id, sleep_hours, food_type, symptoms, prediction))
+    conn.commit()
 
 # ========================================
 # PAGE CONFIGURATION
@@ -1535,7 +1603,7 @@ def login_page():
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            # Section 2: Physical Measurements
+            # Section 2: Physical Measurements (Optional)
             st.markdown("<div class='section-header'>2️⃣ Physical Measurements (Optional)</div>", 
                        unsafe_allow_html=True)
             
@@ -1547,42 +1615,34 @@ def login_page():
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            # Section 3: Lifestyle & Habits
+            # Section 3: Lifestyle & Habits (Optional)
             st.markdown("<div class='section-header'>3️⃣ Lifestyle & Habits (Optional)</div>", 
                        unsafe_allow_html=True)
             
             lifestyle = st.selectbox("Lifestyle", 
-                                    ["Select...", "Sedentary", "Moderate", "Active", "Very Active"])
+                                     ["Select...", "Sedentary", "Moderate", "Active", "Very Active"])
             
             col_smoke, col_alcohol = st.columns(2)
             with col_smoke:
-                smoking = st.selectbox("Smoking Status", 
-                                      ["Select...", "Never", "Former", "Current"])
+                smoking = st.selectbox("Smoking Status", ["Select...", "Never", "Former", "Current"])
             with col_alcohol:
-                alcohol = st.selectbox("Alcohol Consumption", 
-                                      ["Select...", "None", "Occasional", "Moderate", "Frequent"])
+                alcohol = st.selectbox("Alcohol Consumption", ["Select...", "None", "Occasional", "Moderate", "Frequent"])
             
             col_exercise, col_diet = st.columns(2)
             with col_exercise:
-                exercise = st.selectbox("Exercise Frequency", 
-                                       ["Select...", "Never", "1-2 times/week", 
-                                        "3-4 times/week", "5+ times/week"])
+                exercise = st.selectbox("Exercise Frequency", ["Select...", "Never", "1-2 times/week", "3-4 times/week", "5+ times/week"])
             with col_diet:
-                diet = st.selectbox("Diet Type", 
-                                   ["Select...", "Vegetarian", "Non-Vegetarian", "Vegan", "Other"])
+                diet = st.selectbox("Diet Type", ["Select...", "Vegetarian", "Non-Vegetarian", "Vegan", "Other"])
             
             col_sleep, col_stress = st.columns(2)
             with col_sleep:
-                sleep = st.selectbox("Average Sleep (hours/night)", 
-                                    ["Select...", "<5 hours", "5-6 hours", 
-                                     "7-8 hours", "9+ hours"])
+                sleep = st.selectbox("Average Sleep (hours/night)", ["Select...", "<5 hours", "5-6 hours", "7-8 hours", "9+ hours"])
             with col_stress:
-                stress = st.selectbox("Stress Level", 
-                                     ["Select...", "Low", "Moderate", "High", "Very High"])
+                stress = st.selectbox("Stress Level", ["Select...", "Low", "Moderate", "High", "Very High"])
             
             st.markdown("<br>", unsafe_allow_html=True)
             
-            # Section 4: Medical History
+            # Section 4: Medical History (Optional)
             st.markdown("<div class='section-header'>4️⃣ Medical History (Optional)</div>", 
                        unsafe_allow_html=True)
             
@@ -1618,12 +1678,12 @@ def login_page():
             submitted = st.form_submit_button("Login & Continue to App")
             
             if submitted:
-                if email and age:
-                    # Sync with Backend
+                if email.strip() != "" and age:
+                    # Prepare profile data
                     profile_data = {
-                        "email": email,
+                        "email": email.strip(),
                         "age": age,
-                        "language": language.split(' ')[0], # Just the name
+                        "language": language.split(' ')[0],
                         "gender": gender,
                         "height": height,
                         "weight": weight,
@@ -1636,20 +1696,20 @@ def login_page():
                         "stress": stress if stress != "Select..." else None,
                         "conditions": medical_conditions,
                         "family_history": [
-                            "Diabetes" if diabetes_fam else None,
-                            "Cancer" if cancer_fam else None,
-                            "Stroke" if stroke_fam else None,
-                            "Heart Disease" if heart_fam else None,
-                            "Hypertension" if hypertension_fam else None,
-                            "Asthma" if asthma_fam else None,
+                            f for f in [
+                                "Diabetes" if diabetes_fam else None,
+                                "Cancer" if cancer_fam else None,
+                                "Stroke" if stroke_fam else None,
+                                "Heart Disease" if heart_fam else None,
+                                "Hypertension" if hypertension_fam else None,
+                                "Asthma" if asthma_fam else None
+                            ] if f
                         ]
                     }
-                    # Filter out None from family_history
-                    profile_data["family_history"] = [f for f in profile_data["family_history"] if f]
                     
                     try:
                         requests.post("http://localhost:8000/login", json=profile_data)
-                    except Exception as e:
+                    except Exception:
                         st.warning("⚠️ Could not sync with app backend, but logging you in locally.")
                     
                     st.session_state.page = 'redirect'
@@ -1872,3 +1932,11 @@ def main():
 # Run the app
 if __name__ == "__main__":
     main()
+# Yeh code end mein add karein data dekhne ke liye
+st.divider()
+st.subheader("Registered Users (Debug View)")
+try:
+    df = pd.read_sql_query("SELECT * FROM users", conn)
+    st.dataframe(df)
+except Exception as e:
+    st.error("Data abhi available nahi hai.")
