@@ -43,6 +43,20 @@ class ApiService {
     }
   }
 
+  static Future<List<dynamic>> getNearbyDoctors(double lat, double lon, {String? specialty}) async {
+    try {
+      String url = "$baseUrl/doctors?lat=$lat&lon=$lon";
+      if (specialty != null) url += "&specialty=$specialty";
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
   static Future<bool> login(Map<String, dynamic> profileData) async {
     try {
       final response = await http.post(
