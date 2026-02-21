@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'login.dart';
-import 'home.dart';
-import 'api_service.dart';
+import 'auth/login.dart';
+import 'home/home.dart';
+import 'services/api_service.dart';
 import 'ayu_theme.dart';
 
 void main() {
