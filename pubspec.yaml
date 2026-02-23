@@ -1,28 +1,31 @@
-name: ayucare
-description: "AyuCare - Privacy-First Healthcare Sync"
+name: buildbots
+description: Medical early detection app
 publish_to: 'none'
-version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.1.0
+  provider: ^6.0.5
+  image_picker: ^1.0.7
+  intl: ^0.20.2
+  http: ^1.2.0
+  fl_chart: ^0.66.0
+  google_fonts: ^6.1.0
+  sqflite: ^2.3.0
+  path: ^1.9.0
+  pdf: ^3.10.7
+  printing: ^5.11.1
+  path_provider: ^2.1.2
+  url_launcher: ^6.3.1
+  geolocator: ^13.0.1
   flutter_localizations:
     sdk: flutter
-  intl: ^0.20.2
-  image_picker: ^1.0.4
-  google_mlkit_text_recognition: ^0.15.1
-  google_mlkit_commons: ^0.11.1
-  image: ^4.0.17
-  fl_chart: ^0.66.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
 
-flutter:
-  uses-material-design: true
+
