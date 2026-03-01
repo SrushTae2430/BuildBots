@@ -5,7 +5,14 @@ AyuCare is an AI-powered early disease screening platform built during a 24-hour
 It helps users assess their risk for common diseases using machine learning models and symptom-based screening.
 
 ---
+## 👥 Built By 
 
+- Tanisha Mavle 
+- Zahara Boharia 
+- Trupti Patil
+- Kasturi Deo
+- Rutuja Pardeshi
+---
 ## 🚀 Overview
 
 AyuCare is available as:
@@ -119,13 +126,7 @@ Users are advised to consult certified healthcare professionals for confirmed me
 
 ---
 
-## 👥 Team
 
-- Tanisha Mavle 
-- Zahara Boharia 
-- Trupti Patil
-- Kasturi Deo
-- Rutuja Pardeshi
 
 
 
@@ -143,6 +144,7 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
 
 
 
